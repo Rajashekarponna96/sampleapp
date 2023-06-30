@@ -1,0 +1,126 @@
+<style>
+
+    
+
+    :host ::ng-deep .p-orderlist-controls {
+        display: none !important;
+    }
+
+    :host ::ng-deep .p-orderlist  {
+        height: 100%;
+        overflow-y: auto;
+    }
+    
+    :host ::ng-deep .p-orderlist-filter-container  {
+        display:none;
+        border: none;
+        border-bottom: 1px solid lightgray;
+        /* height: 100%; */
+        padding: 10px;
+    }
+
+    :host ::ng-deep .p-orderlist-list  {
+        border: none;
+        border-top: 1px solid lightgrey;
+        height: 100%;
+        overflow-y: auto;
+        
+    }
+
+
+
+
+    .overlay {
+
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        left: 0;
+        background-color: rgba(255, 1, 1, 0);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+    }
+
+
+
+    .listpart {
+        height: 100%;
+        overflow: hidden;
+        border-right: 1px solid lightgrey;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        grid-template-columns: auto;
+    }
+
+    .search-box {
+        width: 100%;
+        padding-left: 16px;
+        padding-top: 10px;
+        padding-right: 10px;
+        padding-bottom: 10px;
+
+    }
+
+    .search-input {
+        width: 100%;
+    }
+
+    .lv {
+        height: 100%;
+        overflow-y: hidden; 
+    }
+
+    :host ::ng-deep .p-paginator {
+        padding: 0;
+        margin: 0;
+        
+    }
+
+
+</style>
+
+
+
+
+
+<div class="listpart">
+    <div class="search-box">
+        <span class="p-input-icon-right">
+            <i class="pi pi-search"></i>
+            <input type="text" pInputText [(ngModel)]="searchText" (ngModelChange)="searchInputChanged($event)" placeholder="Search" class="search-input">
+        </span>
+    </div>
+
+    <div class="lv">
+        <p-orderList [value]="items" filterBy="name,pc" (onSelectionChange)="selectionChange($event)" [(selection)]="selectedRows" [style]="{'height':'100%'}" #listview>
+            <ng-template let-car pTemplate="item">
+                <div>
+                    <div style="font-size:14px;">{{car.itemname}}</div>
+                </div>
+            </ng-template>
+        </p-orderList>
+    </div>
+    
+    <div>
+        <button pButton class="p-button-sm" (click)="handleMore($event)">more</button>
+        <!-- <p-paginator [rows]="recordsPerPage" [totalRecords]="totalRecords" [pageLinkSize]="3" (onPageChange)="paginate($event)" #paginator></p-paginator> -->
+        <!-- <button pButton class="p-button-sm">more</button> -->
+        <p-paginator [rows]="50" [totalRecords]="totalRecords" [pageLinkSize]="3" (onPageChange)="paginate($event)" #paginator></p-paginator>
+    </div>
+    
+    
+</div>
+
+
+
+
+
+
+<ng-template [ngIf]="inProgress">
+    <div class="overlay" id="modal">
+        <p-progressSpinner></p-progressSpinner>
+    </div>
+</ng-template>

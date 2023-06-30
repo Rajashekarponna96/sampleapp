@@ -1,0 +1,492 @@
+<style>
+    .container{
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto;
+      grid-template-columns: auto;
+      
+    } 
+    
+    .namebox {
+        /* background-color: chartreuse; */
+        
+        width: 100%;
+        padding: 1em;
+        padding-left: 1em;
+        padding-top: 1em;
+        padding-right: calc(20%);
+        overflow: auto;
+
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .modifytax {
+        display: grid;
+        grid-template-areas: 'edit delete';
+        gap: 5px;
+    }
+
+    .displayline {
+        display: grid;
+        grid-template-areas: 'qty uom am';
+        gap: 5px;
+    }
+
+    .pcradiogroup{
+        display: grid;
+        grid-template-areas: 'rit ret';
+        gap: 5px;
+        
+    }
+
+    
+.stocktableprogress {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        left: 0;
+        background-color: rgba(255, 1, 1, 0);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+}
+
+
+    .overlay {
+
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        left: 0;
+        background-color: rgba(255, 1, 1, 0);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+    }
+
+
+    /* table, th, td {
+        border: 0.5px solid black;
+    } */
+
+    .journal {
+        display: grid;
+        grid-template-columns: 60% 20% 20%;
+        grid-template-rows: auto auto auto;
+        column-gap: 10px;
+        row-gap: 10px;
+    }
+
+    .debitaccount {
+        background-color: yellow;
+    }
+    
+
+</style> 
+
+<div class="container">
+    <!-- <p-button (click)="showModalDialog()" icon="pi pi-external-link" label="New"></p-button> -->
+
+    <div>
+        <p-button (click)="showModalDialog()" icon="pi pi-external-link" label="New"></p-button>
+        <p-button (click)="handleMore()" icon="pi pi-external-link" label="Next"></p-button>
+    </div>
+
+    <div>Journal Vouchers</div>
+
+    <p-table [value]="journalVoucherList" [scrollable]="true"  
+    selectionMode="single" scrollHeight="500px" 
+        (onRowSelect)="onRowSelect($event)" dataKey="recordid" selectionMode="single" styleClass="p-datatable-gridlines">
+        
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Date</th>
+                <th>Detail</th>
+                <th>Modify</th> 
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-inv let-i="rowIndex">
+            <tr>
+                
+                <td>{{inv.invoicedate}}</td>
+                <td>
+                    <table>
+                        <thead>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let ca of inv.jvEntries">
+                            <td>{{ca.title}}</td> 
+                            <td align="right">
+
+                                <div><span>{{ca.debitcol}}</span><span [style]="ca.style">{{ca.debitfractioncol}}</span></div>
+                                <!-- <div *ngIf="ca.showdebitfractioncol; then thenBlock else elseBlock"></div>
+                                <ng-template #thenBlock><span>{{ca.debitcol}}</span><span>{{ca.debitfractioncol}}</span></ng-template>
+                                <ng-template #elseBlock><span>{{ca.debitcol}}</span><span style="color: #1C00ff00">{{ca.debitfractioncol}}</span></ng-template> -->
+                            </td>
+                            <td align="right">
+                                <div><span>{{ca.creditcol}}</span><span [style]="ca.style">{{ca.creditfractioncol}}</span></div>
+                                <!-- <div *ngIf="ca.showcreditfractioncol; then thenBlock else elseBlock"></div>
+                                <ng-template #thenBlock><span>{{ca.creditcol}}</span><span>{{ca.creditfractioncol}}</span></ng-template>
+                                <ng-template #elseBlock><span>{{ca.creditcol}}</span><span style="color: #1C00ff00">{{ca.creditfractioncol}}</span></ng-template> -->
+                            </td>
+                          </tr>
+                        </tbody>
+                    </table>
+                </td>
+                <td>
+                    <div>
+                        <button pButton class="p-button-sm" (click)="handleView(inv.invoice)">VIEW</button>
+                    </div>
+                </td>
+
+            </tr>
+        </ng-template>
+    </p-table>
+
+
+
+    <p-dialog header="Journal Voucher" [(visible)]="displayModal" [modal]="true" [style]="{width: '100%'}"
+    [draggable]="false" [resizable]="false">
+    
+    
+
+    <form #f="ngForm" autocomplete="off" novalidate class="box">
+
+        <div>
+            <div>Date</div>
+            <p-calendar 
+            [(ngModel)]="selectedDate"
+            [ngModelOptions]="{standalone: true}" 
+            [showTime]="true" [showSeconds]="true" 
+            inputId="time" 
+            appendTo="body" (onSelect)="dateSelected($event)" 
+            [required]="true">
+            </p-calendar> 
+            
+        </div>
+        
+        <br>
+
+        
+        <div class="journal">
+
+            <div></div>
+            <div>DEBIT</div>
+            <div>CREDIT</div>
+            <div class="debitaccount">
+                <p-autoComplete
+                [(ngModel)]="selectedDebitAccount"
+                [suggestions]="filteredDebitAccounts" 
+                (completeMethod)="filterDebits($event)"
+                field="accounthead" 
+                [multiple]="false" class="autocomplete" 
+                (onSelect)="handleOnSelectDebitAccount($event)"
+                [style]="{'width':'100%'}"
+                [inputStyle]="{'width':'100%'}" 
+                [placeholder]="placeholderDebitAccount" 
+                [ngModelOptions]="{standalone: true}"
+                (ngModelChange)="debitAccountChange($event)"
+                [required]="true" #selectParty="ngModel" 
+                [forceSelection]="true">
+
+                <ng-template let-selectedParty pTemplate="item">
+                    <div>{{selectedParty.accounthead}} - {{selectedParty.id}}</div>
+                    <div>{{selectedParty.endpoint}}</div>
+                </ng-template>
+
+                </p-autoComplete> 
+            </div>
+            <div class="debitamount1">
+                <input type="number" min="0"  #selectDebitAmt="ngModel" pInputText class="p-inputtext-sm" 
+        placeholder="enter debit" [(ngModel)]="selectedDebitAmount" 
+        [ngModelOptions]="{standalone: true}"  autocomplete="off" (ngModelChange)="debitAmountChange($event)"
+        required>
+            </div>
+            <div class="debitamount2"></div>
+            <div class="creditaccount">
+                <p-autoComplete
+                [(ngModel)]="selectedCreditAccount"
+                [suggestions]="filteredCreditAccounts" 
+                (completeMethod)="filterCredits($event)"
+                field="accounthead" 
+                [multiple]="false" class="autocomplete" 
+                (onSelect)="handleOnSelectCreditAccount($event)"
+                [style]="{'width':'100%'}"
+                [inputStyle]="{'width':'100%'}" 
+                [placeholder]="placeholderCreditAccount" 
+                [ngModelOptions]="{standalone: true}"
+                (ngModelChange)="creditAccountChange($event)"
+                [required]="true" #selectParty="ngModel" 
+                [forceSelection]="true">
+
+                <ng-template let-selectedParty pTemplate="item">
+                    <div>{{selectedParty.accounthead}} - {{selectedParty.id}}</div>
+                    <div>{{selectedParty.endpoint}}</div>
+                </ng-template>
+
+                </p-autoComplete>
+            </div>
+            <div class="creditamount1"></div>
+            <div class="creditamount2">
+                <input type="number" min="0"  #selectCreditAmt="ngModel" pInputText class="p-inputtext-sm" 
+        placeholder="enter credit" [(ngModel)]="selectedCreditAmount" 
+        [ngModelOptions]="{standalone: true}"  autocomplete="off" (ngModelChange)="creditAmountChange($event)"
+        required>
+            </div>
+
+        </div>
+
+        <div>
+            
+            <textarea pInputTextarea [(ngModel)]="selectedNarration"[ngModelOptions]="{standalone: true}"
+            (ngModelChange)="narrationChange($event)"></textarea>
+
+        </div>
+
+
+        <p-button (click)="showNewVoucherDialog()" icon="pi pi-external-link" label="New Voucher"></p-button>
+        
+        <div class="card">
+            <p-table [value]="selectedVouchers" [scrollable]="true"  
+            selectionMode="single" scrollHeight="200px" 
+             (onRowSelect)="onRowSelect($event)" dataKey="recordid" selectionMode="single" styleClass="p-datatable-sm">
+                
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>Item</th>
+                        <th>Qty</th>
+                        <th>uom</th>
+                        <th>Rate</th>
+                        <th>Amount</th>
+                        <th>Modify</th> 
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-v let-i="rowIndex">
+                    <tr>
+                        <td>{{v.item.itemname}}</td>
+                        <td>{{v.quantity}}</td>
+                        <td>{{v.item.uom.uom}}</td>
+                        <td>{{v.rate | replaceZeroWithEmptyForCS}}</td>
+                        <td>{{v.quantity * v.rate | replaceZeroWithEmptyForCS}}</td>
+                        <td>
+                            <div class="displayline">
+                                <button pButton class="p-button-sm" (click)="handleEditVoucher(v)">EDIT</button>
+                                <button pButton class="p-button-sm" (click)="handleDeleteVoucher(i)">DEL</button>
+                            </div>
+                            
+                        </td>
+                        
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="footer">
+                    <tr>
+                      <td colspan="6">Total</td>
+                      <td>{{getTotalAmount() | number:'1.2-2'}}</td>
+                    </tr>
+                </ng-template>
+
+            </p-table>
+        </div>
+
+
+
+
+        <p-dialog header="Voucher" [(visible)]="displaySubModal" [modal]="true" [style]="{width: '100vw',height:'100vw'}"
+            [draggable]="false" [resizable]="false" [maximizable]="true">
+            
+            
+            <div class="namebox">
+                
+                <div>
+                    <div>Item</div>
+                    <p-autoComplete
+                        [(ngModel)]="voucher.item"
+                        [suggestions]="filteredItems" 
+                        (completeMethod)="filterItems($event)"
+                        field="itemname" 
+                        [multiple]="false" class="autocomplete" 
+                        (onSelect)="handleOnSelectItem($event)"
+                        [style]="{'width':'100%'}"
+                        [inputStyle]="{'width':'100%'}" 
+                        [placeholder]="placeholderItem" 
+                        [ngModelOptions]="{standalone: true}"
+                        (ngModelChange)="itemChange($event)"
+                        [required]="true" #selectItem="ngModel" 
+                        [forceSelection]="true">
+    
+                        <ng-template let-selectedItem pTemplate="item">
+                            <div>{{selectedItem.itemname}} - {{selectedItem.id}}</div>
+                            <div>{{selectedItem.uom.uom}}</div>
+                        </ng-template>
+    
+                    </p-autoComplete>
+                    <ng-template [ngIf]="selectItem.errors">
+                        <small id="username2-help" class="p-error block">you must select an item</small>
+                    </ng-template>
+    
+                </div>
+
+                <div class="displayline">
+                    <div>
+                        <div>quantity</div>
+                        <input type="number" min="0" #selectQty="ngModel" pInputText class="p-inputtext-sm" 
+                    placeholder="enter quantity" [(ngModel)]="voucher.quantity" 
+                    [ngModelOptions]="{standalone: true}"  autocomplete="off" 
+                    required>
+                    <ng-template [ngIf]="selectQty.errors">
+                        <small id="username2-help" class="p-error block">you must enter quantity</small>
+                    </ng-template>
+    
+                    </div>
+
+                    <div>{{voucher.item?.uom.uom}}</div>
+
+                    
+                </div>
+
+                
+                <div class="displayline">
+                    <div>
+                        <div>rate</div>
+                        <input type="number" min="0"  #selectUIR="ngModel" pInputText class="p-inputtext-sm" 
+                    placeholder="enter rate" [(ngModel)]="voucher.rate" 
+                    [ngModelOptions]="{standalone: true}"  autocomplete="off" (ngModelChange)="uirChange($event)"
+                    required>
+                    <ng-template [ngIf]="selectUIR.errors">
+                        <small id="username2-help" class="p-error block">you must enter rate</small>
+                    </ng-template>
+    
+                    </div>
+
+                    <div></div>
+
+                    
+
+                </div>
+
+            </div>
+
+            <ng-template pTemplate="footer">
+                <p-button icon="pi pi-check" (click)="handleAddVoucher()" label="Ok" styleClass="p-button-text"></p-button>
+            </ng-template>
+
+        </p-dialog>
+
+
+
+
+        <p-dialog header="Edit Purchase Voucher" [(visible)]="displaySubEditModal" [modal]="true" [style]="{width: '100vw',height:'100vw'}"
+            [draggable]="false" [resizable]="false">
+            
+            
+            <div class="namebox">
+                
+                <div>
+                    <div>Item</div>
+                    <p-autoComplete
+                        [(ngModel)]="voucher.item"
+                        [suggestions]="filteredItems" 
+                        (completeMethod)="filterItems($event)"
+                        field="itemname" 
+                        [multiple]="false" class="autocomplete" 
+                        (onSelect)="handleOnSelectItem($event)"
+                        [style]="{'width':'100%'}"
+                        [inputStyle]="{'width':'100%'}" 
+                        [placeholder]="placeholderItem" 
+                        [ngModelOptions]="{standalone: true}"
+                        (ngModelChange)="itemChange($event)"
+                        [required]="true" #selectItem="ngModel" 
+                        [forceSelection]="true">
+    
+                        <ng-template let-selectedItem pTemplate="item">
+                            <div>{{selectedItem.itemname}} - {{selectedItem.id}}</div>
+                            <div>{{selectedItem.uom.uom}}</div>
+                        </ng-template>
+    
+                    </p-autoComplete>
+                    <ng-template [ngIf]="selectItem.errors">
+                        <small id="username2-help" class="p-error block">you must select an item</small>
+                    </ng-template>
+    
+                </div>
+
+                <div class="displayline">
+                    <div>
+                        <div>quantity</div>
+                        <input type="number" #selectQty="ngModel" pInputText class="p-inputtext-sm" 
+                    placeholder="enter quantity" [(ngModel)]="voucher.quantity" 
+                    [ngModelOptions]="{standalone: true}"  autocomplete="off" 
+                    required>
+                    <ng-template [ngIf]="selectQty.errors">
+                        <small id="username2-help" class="p-error block">you must enter quantity</small>
+                    </ng-template>
+    
+                    </div>
+
+                    <div>{{voucher.item.uom.uom}}</div>
+                    <div></div>
+    
+                </div>
+
+                
+
+
+                <div>
+                    <div>rate</div>
+                    <input type="number" #selectUIR="ngModel" pInputText class="p-inputtext-sm" 
+                placeholder="enter rate" [(ngModel)]="voucher.rate" 
+                [ngModelOptions]="{standalone: true}"  autocomplete="off" (ngModelChange)="uirChange($event)"
+                required>
+                <ng-template [ngIf]="selectUIR.errors">
+                    <small id="username2-help" class="p-error block">you must enter rate</small>
+                </ng-template>
+
+                </div>
+
+
+                
+
+
+            </div>
+
+            
+                
+            
+
+            
+            <ng-template pTemplate="footer">
+                <p-button icon="pi pi-check" (click)="handleUpdateVoucher()" label="Ok" styleClass="p-button-text"></p-button>
+            </ng-template>
+        </p-dialog>
+
+
+        
+
+
+
+    </form>
+        
+    <ng-template pTemplate="footer">
+        <p-button icon="pi pi-check" (click)="handleSaveJournalVoucher()" label="Save" styleClass="p-button-text"></p-button>
+    </ng-template>
+    </p-dialog>
+
+    
+
+    <p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+
+    <ng-template [ngIf]="inProgress">
+        <div class="overlay" id="modal">
+            <p-progressSpinner></p-progressSpinner>
+        </div>
+    </ng-template>
+
+    
+</div>

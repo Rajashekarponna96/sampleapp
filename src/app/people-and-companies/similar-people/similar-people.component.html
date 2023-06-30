@@ -1,0 +1,100 @@
+<style>
+/* :host ::ng-deep .p-dropdown {
+	 width: 14rem;
+	 font-weight: normal;
+} */
+ :host ::ng-deep .product-name {
+	 font-size: 1rem;
+	 font-weight: 700;
+}
+ :host ::ng-deep .product-description {
+	 margin: 0 0 1rem 0;
+}
+/* :host ::ng-deep .product-category-icon {
+	 vertical-align: middle;
+	 margin-right: 0.5rem;
+}
+ :host ::ng-deep .product-category {
+	 font-weight: 600;
+	 vertical-align: middle;
+} */
+ :host ::ng-deep .product-list-item {
+	 display: flex;
+	 align-items: center;
+	 /* padding: 1rem; */
+	 width: 100%;
+}
+ /* :host ::ng-deep .product-list-item img {
+	 width: 150px;
+	 box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+	 margin-right: 2rem;
+} */
+
+ :host ::ng-deep .product-list-item .product-list-detail {
+	 flex: 1 1 0;
+}
+ /* :host ::ng-deep .product-list-item .p-rating {
+	 margin: 0 0 0.5rem 0;
+} */
+ /* :host ::ng-deep .product-list-item .product-price {
+	 font-size: 1.5rem;
+	 font-weight: 600;
+	 margin-bottom: 0.5rem;
+	 align-self: flex-end;
+}
+ :host ::ng-deep .product-list-item .product-list-action {
+	 display: flex;
+	 flex-direction: column;
+} */
+ /* :host ::ng-deep .product-list-item .p-button {
+	 margin-bottom: 0.5rem;
+}
+ :host ::ng-deep .product-grid-item {
+	 margin: 0.5em;
+	 border: 1px solid var(--surface-border);
+}
+ :host ::ng-deep .product-grid-item .product-grid-item-top, :host ::ng-deep .product-grid-item .product-grid-item-bottom {
+	 display: flex;
+	 align-items: center;
+	 justify-content: space-between;
+}
+ :host ::ng-deep .product-grid-item img {
+	 width: 75%;
+	 box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+	 margin: 2rem 0;
+} */
+ /* :host ::ng-deep .product-grid-item .product-grid-item-content {
+	 text-align: center;
+}
+ :host ::ng-deep .product-grid-item .product-price {
+	 font-size: 1.5rem;
+	 font-weight: 600;
+} */
+</style>
+
+
+<p-dataView [value]="similarPeople" layout="list" [paginator]="true" [rows]="25" [style]="{'height':'100%'}">
+    <ng-template let-product pTemplate="listItem">
+        <div class="col-12">
+            <div class="product-list-item">
+                <!-- <img [src]="'assets/showcase/images/demo/product/' + product.image" [alt]="product.name"/> -->
+                <div class="product-list-detail">
+                    <div class="product-name">{{product.name}}</div>
+                    <div class="product-description">{{product.similarity}}</div>
+                    <!-- <p-rating [ngModel]="product.rating" [readonly]="true" [cancel]="false"></p-rating>
+                    <i class="pi pi-tag product-category-icon"></i><span class="product-category">{{product.category}}</span> -->
+                </div>
+                
+            </div>
+        </div>
+    </ng-template>
+</p-dataView>
+
+
+<!-- <p-dataView [value]="similarPeople" layout="list" [paginator]="true" [rows]="10">
+    <ng-template let-car pTemplate="listItem">
+        <div>
+            {{car.name}}
+        </div>
+    </ng-template>
+</p-dataView> -->

@@ -1,0 +1,294 @@
+<style>
+    .box {
+        
+        width: 100%;
+        padding: 1em;
+        padding-left: 1em;
+        padding-top: 1em;
+        padding-right: calc(20%);
+        
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        
+    }
+
+    .namebox {
+        /* background-color: chartreuse; */
+        
+        width: 100%;
+        padding: 1em;
+        padding-left: 1em;
+        padding-top: 1em;
+        padding-right: calc(20%);
+
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .modifytax {
+        display: grid;
+        grid-template-areas: 'edit delete';
+        gap: 5px;
+    }
+
+    .displayline {
+        display: grid;
+        grid-template-areas: 'qty uom am';
+        gap: 5px;
+    }
+
+    .pcradiogroup{
+        display: grid;
+        grid-template-areas: 'rit ret';
+        gap: 5px;
+        
+    }
+
+
+    .overlay {
+
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        left: 0;
+        background-color: rgba(255, 1, 1, 0);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+    }
+
+</style>
+
+
+
+<div class="container">
+
+
+    <div>Register of Day Tasks</div>
+
+    <p-button (click)="showModalDialog()" icon="pi pi-external-link" label="Generate Day Tasks"></p-button>
+
+    <p-table [value]="sdTaskList" [scrollable]="true"  
+    selectionMode="single" scrollHeight="500px" 
+        (onRowSelect)="onRowSelect($event)" dataKey="recordid" selectionMode="single" styleClass="p-datatable-gridlines">
+        
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Id</th>
+                <th>Party</th>
+                <th>Mobile</th>
+                <th>Item</th>
+                <th>Quantity</th>
+                <th>ETD</th>
+                <th>Modify</th>
+                
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-ah let-i="rowIndex">
+            <tr>
+                
+                <td>{{ah.id}}</td>
+                <td>{{ah.accounthead}}</td>
+                <td>{{ah.endpoint}}</td>
+                <td>{{ah.itemname}}</td>
+                <td>{{ah.quantity}}</td>
+                <!-- <td><input type="number" min="0" pInputText class="p-inputtext-sm" 
+                    placeholder="enter quantity" 
+                    autocomplete="off" (input)="onSearchChange($event,i)"></td> -->
+                <td>{{ah.eststartdt}}</td>
+                <td>
+                    <div>
+                        <button pButton class="p-button-sm" (click)="handleLapse(ah,i)">LAPSE</button>
+                        <button pButton class="p-button-sm" (click)="handleEdit(ah,i)">EDIT</button>
+                        <button pButton class="p-button-sm" (click)="handleDone(ah)">DONE</button>
+                    </div>
+                </td> 
+
+            </tr>
+        </ng-template>
+    </p-table>
+
+
+    <p-dialog header="Task Detail" [(visible)]="displayModal" [modal]="true" [style]="{width: '100%'}"
+        [draggable]="false" [resizable]="false">
+    
+    
+        <form #f="ngForm" autocomplete="off" novalidate class="box">
+
+            <div>
+                <p>Task Title</p>
+    
+                <div class="ahinputbox">
+                    <input type="text" #accountHeadTitle="ngModel" pInputText #ahinput class="p-inputtext-sm" placeholder="enter task title" [ngModelOptions]="{standalone: true}" 
+                    [(ngModel)]="selectedTaskTitle" autocomplete="off" minlength="6" required (ngModelChange)="inputChange($event)">
+                    <ng-template [ngIf]="accountHeadTitle.errors">
+                        <small id="username2-help" class="p-error block">task title is required and must be atleast 6 letters</small>
+                    </ng-template>
+                </div>
+
+                <div>
+                    <div>Tags</div>
+                    <span class="p-fluid">
+                        <p-autoComplete [(ngModel)]="selectedTags" [ngModelOptions]="{standalone: true}" 
+                        [suggestions]="filteredTags" (completeMethod)="filterTags($event)" field="tag" [multiple]="true" [dropdown]="true">
+                        </p-autoComplete>
+                    </span>
+                </div>
+
+            </div>
+
+
+            <div>
+                <div>From employee</div>
+                <p-autoComplete
+                    [(ngModel)]="selectedFromParty"
+                    [suggestions]="filteredFromParties" 
+                    (completeMethod)="filterFromParties($event)"
+                    field="accounthead" 
+                    [multiple]="false" class="autocomplete" 
+                    (onSelect)="handleOnSelectFromParty($event)"
+                    [style]="{'width':'100%'}"
+                    [inputStyle]="{'width':'100%'}" 
+                    [placeholder]="placeholderFromParty" 
+                    [ngModelOptions]="{standalone: true}"
+                    (ngModelChange)="fromPartyChange($event)"
+                    [required]="true" #selectFromParty="ngModel" 
+                    [forceSelection]="true">
+    
+                    <ng-template let-selectedFromParty pTemplate="item">
+                        <div>{{selectedFromParty.accounthead}} - {{selectedFromParty.id}}</div>
+                        <div>{{selectedFromParty.endpoint}}</div>
+                    </ng-template>
+    
+                </p-autoComplete>
+                <ng-template [ngIf]="selectFromParty.errors">
+                    <small id="username2-help" class="p-error block">you must select an employee</small>
+                </ng-template>
+    
+            </div>
+
+            <div>
+                <div>To employee</div>
+                <p-autoComplete
+                    [(ngModel)]="selectedToParty"
+                    [suggestions]="filteredToParties" 
+                    (completeMethod)="filterToParties($event)"
+                    field="accounthead" 
+                    [multiple]="false" class="autocomplete" 
+                    (onSelect)="handleOnSelectToParty($event)"
+                    [style]="{'width':'100%'}"
+                    [inputStyle]="{'width':'100%'}" 
+                    [placeholder]="placeholderToParty" 
+                    [ngModelOptions]="{standalone: true}"
+                    (ngModelChange)="toPartyChange($event)"
+                    [required]="true" #selectToParty="ngModel" 
+                    [forceSelection]="true">
+    
+                    <ng-template let-selectedToParty pTemplate="item">
+                        <div>{{selectedToParty.accounthead}} - {{selectedToParty.id}}</div>
+                        <div>{{selectedToParty.endpoint}}</div>
+                    </ng-template>
+    
+                </p-autoComplete>
+                <ng-template [ngIf]="selectToParty.errors">
+                    <small id="username2-help" class="p-error block">you must select an employee</small>
+                </ng-template>
+    
+            </div>
+
+
+
+        </form>
+        
+
+
+        
+        <ng-template pTemplate="footer">
+            <p-button icon="pi pi-check" (click)="handleGet()" label="Generate Tasks" styleClass="p-button-text"></p-button>
+        </ng-template>
+    </p-dialog>
+
+
+    <p-dialog header="Edit Task" [(visible)]="displayPromiseModal" [modal]="true" [style]="{width: '100%'}"
+    [draggable]="false" [resizable]="false" [closable]="false">
+
+    <form #f="ngForm" autocomplete="off" novalidate class="box">
+
+        
+        
+        
+        <div>
+            <div>Party</div>
+            <div>{{selectedParty}}</div>
+            <div>{{selectedEndpoint}}</div>
+            
+        </div>
+
+
+
+        
+
+        <div class="card">
+            <p-table [value]="selectedVouchers" [scrollable]="true"  
+            selectionMode="single" scrollHeight="200px" 
+            (onRowSelect)="onRowSelect($event)" dataKey="recordid" selectionMode="single" styleClass="p-datatable-sm">
+                
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>Item</th>
+                        <th>Qty</th>
+                        <th>uom</th>
+                        <th>Rate</th>
+                        <th>Amount</th>
+                        
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-v let-i="rowIndex">
+                    <tr>
+                        <td>{{v.object.itemdef.itemname}}</td>
+                        <!-- <td>{{v.quantity}}</td> -->
+                        <td>
+                            <input type="number" min="0" pInputText class="p-inputtext-sm" 
+                        placeholder="enter quantity" 
+                        autocomplete="off" (input)="onSearchChange($event,i)" [value]="v.quantity">
+                            
+                        </td>
+                        <td>{{v.object.itemdef.uom.uom}}</td>
+                        <td>{{v.rateaftertaxes}}</td>
+                        <td>{{v.quantity * v.rateaftertaxes}}</td>
+                        
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+
+        
+
+    </form>
+
+        <ng-template pTemplate="footer">
+            <p-button icon="pi pi-check" (click)="handleEditTask()" label="Save" styleClass="p-button-text"></p-button>
+        </ng-template>
+
+
+    </p-dialog>
+
+
+
+
+    <p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+
+
+    <ng-template [ngIf]="inProgress">
+        <div class="overlay" id="modal">
+            <p-progressSpinner></p-progressSpinner>
+        </div>
+    </ng-template>
+
+    
+    
+</div>

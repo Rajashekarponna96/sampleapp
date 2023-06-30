@@ -1,0 +1,25 @@
+
+<style>
+    button {
+         
+       margin-top: 50px; 
+       margin-left: 20px;
+       margin-right: 5px;
+    }
+</style>
+
+<div class="container">
+    <ng-template [ngIf]="lo.digitalkey.profile.view"><button pButton class="p-button-sm" (click)="handleProfile()">Profile</button></ng-template>
+    <ng-template [ngIf]="lo.digitalkey.partyaccountheads.view"><button pButton class="p-button-sm" (click)="handlePartyAccountHeads()">Party Account Heads</button></ng-template>
+    <ng-template [ngIf]="lo.digitalkey.otheraccountheads.view"><button pButton class="p-button-sm" (click)="handleOtherAccountHeads()">Other Account Heads</button></ng-template>
+    <ng-template [ngIf]="lo.digitalkey.items.view"><button pButton class="p-button-sm" (click)="handleItems()">Items</button></ng-template>
+    <button pButton class="p-button-sm" (click)="handleUOMs()">UOMs</button>
+    <ng-template [ngIf]="lo.digitalkey.writecheque.view"><button pButton class="p-button-sm" (click)="handleWriteCheque()">Write Cheque</button></ng-template>
+    <ng-template [ngIf]="lo.digitalkey.receivecheque.view"><button pButton class="p-button-sm" (click)="handleReceiveCheque()">Receive Cheque</button></ng-template>
+    <!-- <button pButton class="p-button-sm" (click)="handleEquityPayable()">Equity Payable</button> -->
+    <button pButton class="p-button-sm" (click)="handleTags()">Tags</button>
+    <button pButton class="p-button-sm" (click)="handleItemLevels()">Item Levels</button>
+    <button pButton class="p-button-sm" (click)="handleStockLocations()">Stock Locations</button>
+    <button pButton class="p-button-sm" (click)="handleOpeningBalances()">Opening Balances</button>
+    
+</div>

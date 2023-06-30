@@ -1,0 +1,96 @@
+<p-table [value]="daytasks" [scrollable]="true"  
+    selectionMode="single" scrollHeight="500px" scrollWidth="1800px"
+        (onRowSelect)="onRowSelect($event)" dataKey="recordid" selectionMode="single" 
+        styleClass="p-datatable-gridlines" #dt [globalFilterFields]="['item','quantity','itemdetail.reorderquantity','status']">
+        
+        <ng-template pTemplate="caption">
+            <div class="table-header">
+                Milk Supply Task Sheet as on {{today | date:'fullDate'}}
+                <span class="p-input-icon-right">
+                    <i class="pi pi-search"></i> 
+                    <input #searchField pInputText type="text" (input)="dt.filterGlobal(searchField.value, 'contains')" placeholder="Search" />
+                </span>
+            </div>
+            <div class="flex">
+                <!-- <button type="button" pButton pRipple icon="pi pi-file" (click)="dt.exportCSV()" class="mr-2" pTooltip="CSV" tooltipPosition="bottom"></button> -->
+                <button type="button" pButton pRipple icon="pi pi-file-excel" (click)="exportExcel()" class="p-button-success mr-2"  pTooltip="XLS" tooltipPosition="bottom"></button>
+                <!-- <button type="button" pButton pRipple icon="pi pi-file-pdf" (click)="newExportPdf()" class="p-button-warning mr-2" pTooltip="PDF" tooltipPosition="bottom"></button> -->
+                <!-- <button type="button" pButton pRipple icon="pi pi-filter" (click)="dt.exportCSV({selectionOnly:true})" class="p-button-info ml-auto" pTooltip="Selection Only" tooltipPosition="bottom"></button> -->
+            </div>
+        </ng-template> 
+
+        <ng-template pTemplate="header"> 
+            <tr>
+                <th pSortableColumn="id">
+                    Order Id
+                        <p-sortIcon field="id"></p-sortIcon>
+                </th>
+                
+                <th style="width: 200px;" pSortableColumn="customer">
+                    Customer
+                        <p-sortIcon field="customer"></p-sortIcon>
+                </th>
+
+                <th style="width: 200px;" pSortableColumn="itemname">
+                    Item
+                        <p-sortIcon field="itemname"></p-sortIcon>
+                </th>
+
+                <th pSortableColumn="qty">
+                    Quantity
+                        <p-sortIcon field="qty"></p-sortIcon>
+                </th>
+                
+                <th pSortableColumn="uom">
+                    UOM
+                        <p-sortIcon field="uom"></p-sortIcon>
+                </th>
+                
+                <th pSortableColumn="interval">
+                    Interval
+                        <p-sortIcon field="interval"></p-sortIcon>
+                </th>
+                <th pSortableColumn="last_sale_date">
+                    Last Sale On
+                        <p-sortIcon field="last_sale_date"></p-sortIcon>
+                </th>
+                <th pSortableColumn="tel">
+                    Telephone
+                        <p-sortIcon field="tel"></p-sortIcon>
+                </th>
+                <th pSortableColumn="delivery">
+                    Delivery Inch.
+                        <p-sortIcon field="delivery"></p-sortIcon>
+                </th>
+                
+                
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-inv let-i="rowIndex">
+            <tr>
+                
+                <td>{{inv.id}}</td>
+                <td>{{inv.customer}}</td>
+                <td>{{inv.itemname}}</td>
+                <td>{{inv.qty | replaceZeroWithEmptyForCS}}</td>
+                <td>{{inv.uom}}</td>
+                <td>{{inv.interval}}</td>
+                <td>{{inv.last_sale_date}}</td>
+                <td>{{inv.tel}}</td>
+                <td>{{inv.delivery}}</td>
+
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+            <tr>
+              <td colspan="4">Total</td>
+              <td>{{getTotalAmount() | number:'1.2-2'}}</td>
+            </tr>
+          </ng-template>
+    </p-table>
+
+    <ng-template [ngIf]="inProgress">
+        <div class="overlay" id="modal">
+          <p-progressSpinner></p-progressSpinner>
+        </div>
+    </ng-template>

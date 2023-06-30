@@ -1,0 +1,59 @@
+<style>
+    .container{
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      display: grid;
+      /* grid-template-rows: auto;
+      grid-template-columns: auto; */
+      grid-auto-columns: 1fr;
+      grid-auto-flow: column;
+      
+    }
+    .overlay {
+
+position: absolute;
+height: 100%;
+width: 100%;
+top: 0;
+left: 0;
+background-color: rgba(255, 1, 1, 0);
+display: flex;
+justify-content: center;
+align-items: center;
+
+}
+
+
+</style>
+
+<p>DASHBOARD</p>
+
+<div class="container">
+    <div>
+        <div class="card">
+            <h5>LIQUIDITY POSITION</h5>
+            <p-chart type="bar" [data]="basicData" [options]="basicOptions"></p-chart>
+        </div>
+        <!-- <ng-template [ngIf]="inLiquidityProgress">
+            <div class="navi infoi" id="modal">
+                <p-progressSpinner></p-progressSpinner>
+            </div>
+        </ng-template> -->
+        
+    </div>
+    
+    <div>
+        <h5>WEEK SALES</h5>
+        <div class="card">
+            <h5>Weekly Sales</h5>
+            <p-chart type="line" [data]="weeklySalesData" [options]="weeklySalesOptions"></p-chart>
+        </div>
+    </div>
+
+
+    
+    <p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+
+
+</div>

@@ -1,0 +1,207 @@
+<style>
+    .container{
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto;
+      grid-template-columns: auto;
+      
+    } 
+    
+    .namebox {
+        /* background-color: chartreuse; */
+        
+        width: 100%;
+        padding: 1em;
+        padding-left: 1em;
+        padding-top: 1em;
+        padding-right: calc(20%);
+        overflow: auto;
+
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .modifytax {
+        display: grid;
+        grid-template-areas: 'edit delete';
+        gap: 5px;
+    }
+
+    .displayline {
+        display: grid;
+        grid-template-areas: 'qty uom am';
+        gap: 5px;
+    }
+
+    .pcradiogroup{
+        display: grid;
+        grid-template-areas: 'rit ret';
+        gap: 5px;
+        
+    }
+
+    
+.stocktableprogress {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        left: 0;
+        background-color: rgba(255, 1, 1, 0);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+}
+
+
+    .overlay {
+
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        left: 0;
+        background-color: rgba(255, 1, 1, 0);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+    }
+
+
+    /* table, th, td {
+        border: 0.5px solid black;
+    } */
+
+    .hide-div{
+    display: none;
+  }
+    
+
+</style> 
+
+
+<div class="container">
+  <div>
+    <button type="submit" pButton class="p-button-sm" (click)="print($event)">PRINT</button>
+    <!-- <button type="submit" pButton class="p-button-sm" (click)="testprint($event)">TEST PRINT</button> -->
+  </div>
+  <div class="namebox" id="fa">
+
+    <table>
+      <thead>
+      </thead>
+      <tbody>
+        <tr *ngFor="let ca of compiledAccountsDebit">
+          <td>{{ca.title}}</td>
+          <td align="right">
+            <div *ngIf="ca.showfraction; then thenBlock else elseBlock"></div>
+            <ng-template #thenBlock><span>{{ca.integer}}</span><span>{{ca.fraction}}</span></ng-template>
+            <!-- <ng-template #elseBlock><span>{{ca.integer}}</span><span style="color: #1C00ff00">{{ca.fraction}}</span></ng-template> -->
+            <ng-template #elseBlock><span>{{ca.integer}}</span><span
+                style="color: #1C00ff00">{{ca.fraction}}</span></ng-template>
+          </td>
+
+        </tr>
+      </tbody>
+    </table>
+    <table>
+      <thead>
+      </thead>
+      <tbody>
+        <tr *ngFor="let ca of compiledAccountsCredit">
+          <td>{{ca.title}}</td>
+          <td align="right">
+            <div *ngIf="ca.showfraction; then thenBlock else elseBlock"></div>
+            <ng-template #thenBlock><span>{{ca.integer}}</span><span>{{ca.fraction}}</span></ng-template>
+            <!-- <ng-template #elseBlock><span>{{ca.integer}}</span><span style="color: #1C00ff00">{{ca.fraction}}</span></ng-template> -->
+            <ng-template #elseBlock><span>{{ca.integer}}</span><span
+                style="color: #1C00ff00">{{ca.fraction}}</span></ng-template>
+          </td>
+
+        </tr>
+      </tbody>
+    </table>
+    <br>
+    <br>
+    <br>
+    <table>
+      <thead>
+      </thead>
+      <tbody>
+        <tr *ngFor="let ca of compiledAccountsPLDebit">
+          <td>{{ca.title}}</td>
+          <td align="right">
+            <div *ngIf="ca.showfraction; then thenBlock else elseBlock"></div>
+            <ng-template #thenBlock><span>{{ca.integer}}</span><span>{{ca.fraction}}</span></ng-template>
+            <ng-template #elseBlock><span>{{ca.integer}}</span><span
+                style="color: #1C00ff00">{{ca.fraction}}</span></ng-template>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <table>
+      <thead>
+      </thead>
+      <tbody>
+        <tr *ngFor="let ca of compiledAccountsPLCredit">
+          <td>{{ca.title}}</td>
+          <td align="right">
+            <div *ngIf="ca.showfraction; then thenBlock else elseBlock"></div>
+            <ng-template #thenBlock><span>{{ca.integer}}</span><span>{{ca.fraction}}</span></ng-template>
+            <ng-template #elseBlock><span>{{ca.integer}}</span><span
+                style="color: #1C00ff00">{{ca.fraction}}</span></ng-template>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <br>
+    <br>
+    <br>
+    <table>
+      <thead>
+      </thead>
+      <tbody>
+        <tr *ngFor="let ca of compiledAccountsBSA">
+          <td>{{ca.title}}</td>
+          <td align="right">
+            <div *ngIf="ca.showfraction; then thenBlock else elseBlock"></div>
+            <ng-template #thenBlock><span>{{ca.integer}}</span><span>{{ca.fraction}}</span></ng-template>
+            <ng-template #elseBlock><span>{{ca.integer}}</span><span
+                style="color: #1C00ff00">{{ca.fraction}}</span></ng-template>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <table>
+      <thead>
+      </thead>
+      <tbody>
+        <tr *ngFor="let ca of compiledAccountsBSL">
+          <td>{{ca.title}}</td>
+          <td align="right">
+            <div *ngIf="ca.showfraction; then thenBlock else elseBlock"></div>
+            <ng-template #thenBlock><span>{{ca.integer}}</span><span>{{ca.fraction}}</span></ng-template>
+            <ng-template #elseBlock><span>{{ca.integer}}</span><span
+                style="color: #1C00ff00">{{ca.fraction}}</span></ng-template>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- <pre>{{finalAccounts | json}}</pre> -->
+
+  </div>
+
+  
+
+  <ng-template [ngIf]="inProgress">
+    <div class="overlay" id="modal">
+      <p-progressSpinner></p-progressSpinner>
+    </div>
+  </ng-template>
+</div>
+

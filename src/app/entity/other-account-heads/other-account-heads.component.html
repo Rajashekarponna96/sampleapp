@@ -1,0 +1,278 @@
+
+<style>
+    .box {
+        
+        width: 100%;
+        padding: 1em;
+        padding-left: 1em;
+        padding-top: 1em;
+        padding-right: calc(20%);
+        
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        
+    }
+
+    .namebox {
+        /* background-color: chartreuse; */
+        
+        width: 100%;
+        padding: 1em;
+        padding-left: 1em;
+        padding-top: 1em;
+        padding-right: calc(20%);
+
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .modifytax {
+        display: grid;
+        grid-template-areas: 'edit delete';
+        gap: 5px;
+    }
+
+    .displayline {
+        display: grid;
+        grid-template-areas: 'qty uom am';
+        gap: 5px;
+    }
+
+    .pcradiogroup{
+        display: grid;
+        grid-template-areas: 'rit ret';
+        gap: 5px;
+        
+    }
+
+
+    .overlay {
+
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        left: 0;
+        background-color: rgba(255, 1, 1, 0);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+    }
+
+</style>
+
+
+
+<div class="container">
+    
+    <div>Register of Accountheads</div> 
+
+    <div>
+        <p-button (click)="showModalDialog()" icon="pi pi-external-link" label="New"></p-button>
+        <p-button (click)="handleMore()" icon="pi pi-external-link" label="Next"></p-button>
+    </div>
+
+    <p-table [value]="accountheads" [scrollable]="true"  
+    selectionMode="single" scrollHeight="500px" 
+        (onRowSelect)="onRowSelect($event)" dataKey="recordid" selectionMode="single" styleClass="p-datatable-gridlines">
+        
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Id</th>
+                <th>Account</th>
+                <th>Type</th>
+                <th>Part of</th>
+                <th>Modify</th>
+                
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-ah let-i="rowIndex">
+            <tr>
+                
+                <td>{{ah.id}}</td>
+                <td>{{ah.accounthead}}</td>
+                <td>{{ah.defaultgroup}}</td>
+                <td>{{ah.partof}}</td>
+                <td>
+                    <div>
+                        <button pButton class="p-button-sm" (click)="handleDisplay(ah)">VIEW</button>
+                        <button pButton class="p-button-sm" (click)="handleEditAccount(ah)">EDIT</button>
+                    </div>
+                </td> 
+
+            </tr>
+        </ng-template>
+    </p-table>
+
+
+
+
+    <p-dialog header="Accounthead" [(visible)]="displayModal" [modal]="true" [style]="{width: '100%',height:'100%'}"
+        [draggable]="false" [resizable]="false">
+    
+    
+        <div class="formbox">
+    
+            <form #f="ngForm" autocomplete="off" novalidate class="box">
+        
+                <div class="modifytax">
+
+                    <div class="ahinputbox">
+                        <input type="text" #accountHeadTitle="ngModel" pInputText #ahinput class="p-inputtext-sm" placeholder="enter account head" [ngModelOptions]="{standalone: true}" [(ngModel)]="accountHead.accounthead" autocomplete="off" minlength="6" required (ngModelChange)="inputChange($event)">
+                        <ng-template [ngIf]="accountHeadTitle.errors">
+                            <small id="username2-help" class="p-error block">account head is required and must be atleast 6 letters</small>
+                        </ng-template>
+                    </div>
+
+                    <div>
+                        <p-dropdown #selectAccountType="ngModel" [options]="defaultGroups" [(ngModel)]="accountHead.defaultgroup" (ngModelChange)="defaultGroupChange($event)" optionLabel="type" optionValue="type" [ngModelOptions]="{standalone: true}" [required]="true" ></p-dropdown>
+                        <ng-template [ngIf]="selectAccountType.errors">
+                            <small id="username2-help" class="p-error block">you must select a default account group</small>
+                        </ng-template>
+                    </div>
+
+                </div>
+
+                <div>
+                    <div>Part of</div>
+                    <p-dropdown [options]="partofList" 
+                [(ngModel)]="accountHead.partof" 
+                optionLabel="type" 
+                optionValue="type" 
+                (ngModelChange)="partofChange($event)"
+                [required]="true" #selectItemFAType="ngModel" 
+                [ngModelOptions]="{standalone: true}" [disabled]="disablePartof">
+                    </p-dropdown>
+                    <ng-template [ngIf]="selectItemFAType.errors">
+                        <small id="username2-help" class="p-error block">you must select partof account</small>
+                    </ng-template>
+                </div>
+                
+                
+                <div class="field-checkbox">
+                    <p-checkbox [(ngModel)]="accountHead.isgroup" [binary]="true" inputId="binary" [ngModelOptions]="{standalone: true}"></p-checkbox>
+                    <div class="check-label">
+                        <label for="binary">Is Group?</label>
+                        <div>{{ accountHead.isgroup }}</div>
+                    </div>    
+                </div>
+            
+                
+            
+                
+            
+            </form>
+        
+            <!-- <pre>{{accountHead | json}}</pre>
+            <pre>{{accountHeadTitle.errors | json}}</pre>
+            <pre>{{ selectAccountType.errors | json}}</pre> -->
+        
+        </div>
+    
+
+
+        
+        <ng-template pTemplate="footer">
+            <p-button icon="pi pi-check" (click)="handleSave()" label="Save" styleClass="p-button-text"></p-button>
+        </ng-template>
+    </p-dialog>
+
+
+
+
+
+
+
+
+
+
+
+    <p-dialog header="Accounthead" [(visible)]="displayEditModal" [modal]="true" [style]="{width: '100%',height:'100%'}"
+        [draggable]="false" [resizable]="false">
+    
+    
+        <div class="formbox">
+    
+            <form #f="ngForm" autocomplete="off" novalidate class="box">
+        
+                <div class="modifytax">
+
+                    <div class="ahinputbox">
+                        <input type="text" #accountHeadTitle="ngModel" pInputText #ahinput class="p-inputtext-sm" placeholder="enter account head" 
+                        [ngModelOptions]="{standalone: true}" [(ngModel)]="accountHead.accounthead" autocomplete="off" minlength="6" required (ngModelChange)="inputChange($event)" [disabled]="true">
+                        <ng-template [ngIf]="accountHeadTitle.errors">
+                            <small id="username2-help" class="p-error block">account head is required and must be atleast 6 letters</small>
+                        </ng-template>
+                    </div>
+
+                    <div>
+                        <p-dropdown #selectAccountType="ngModel" [options]="defaultGroups" 
+                        [(ngModel)]="accountHead.defaultgroup" (ngModelChange)="defaultGroupChange($event)" optionLabel="type" optionValue="type" [ngModelOptions]="{standalone: true}" [required]="true" [disabled]="true"></p-dropdown>
+                        <ng-template [ngIf]="selectAccountType.errors">
+                            <small id="username2-help" class="p-error block">you must select a default account group</small>
+                        </ng-template>
+                    </div>
+
+                </div>
+
+                <div>
+                    <div>Part of</div>
+                    <p-dropdown [options]="partofList" 
+                [(ngModel)]="accountHead.partof" 
+                optionLabel="type" 
+                optionValue="type" 
+                (ngModelChange)="partofChange($event)"
+                [required]="true" #selectItemFAType="ngModel" 
+                [ngModelOptions]="{standalone: true}" [disabled]="disablePartof">
+                    </p-dropdown>
+                    <ng-template [ngIf]="selectItemFAType.errors">
+                        <small id="username2-help" class="p-error block">you must select partof account</small>
+                    </ng-template>
+                </div>
+                
+                
+                <div class="field-checkbox">
+                    <p-checkbox [(ngModel)]="accountHead.isgroup" [binary]="true" inputId="binary" [ngModelOptions]="{standalone: true}"></p-checkbox>
+                    <div class="check-label">
+                        <label for="binary">Is Group?</label>
+                        <div>{{ accountHead.isgroup }}</div>
+                    </div>    
+                </div>
+            
+                
+            
+                
+            
+            </form> 
+        
+            <!-- <pre>{{accountHead | json}}</pre>
+            <pre>{{accountHeadTitle.errors | json}}</pre>
+            <pre>{{ selectAccountType.errors | json}}</pre> -->
+        
+        </div>
+    
+
+
+        
+        <ng-template pTemplate="footer">
+            <p-button icon="pi pi-check" (click)="handleUpdate()" label="Update" styleClass="p-button-text"></p-button>
+        </ng-template>
+    </p-dialog>
+
+
+
+
+    <p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+
+
+    <ng-template [ngIf]="inProgress">
+        <div class="overlay" id="modal">
+            <p-progressSpinner></p-progressSpinner>
+        </div>
+    </ng-template>
+
+    
+</div>

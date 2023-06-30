@@ -1,0 +1,189 @@
+<style>
+    .container{
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto;
+      grid-template-columns: 0.25fr 1fr;
+      
+    }
+    .firstpart {
+        height: 100%;
+        overflow: hidden;
+        border-right: 1px solid lightgrey;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        grid-template-columns: auto;
+    }
+    .secondpart {
+        overflow: hidden;
+        display: grid;
+        grid-template-rows: auto 1fr;
+        grid-template-columns: auto;
+    }
+
+    .breadcrumb {
+        grid-row: 1;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        
+    }
+    .newview {
+        grid-row: 2;
+        overflow-y: auto;
+    }
+
+    .newedit-btn-container {
+        background-color: #efefef;
+        display: flex;
+        grid-column: 2;
+        align-items: center;
+    }
+
+    .newbtn {
+        margin-right: 5px;
+    }
+
+    .editbtn {
+        margin-right: 5px;
+        
+    }
+    .savebtn {
+        margin-right: 20px;
+    }
+
+    .searchbtn {
+        margin-right: 5px;
+    }
+
+    .search {
+        grid-row: 1;
+    }
+    .listview {
+        height: 100%;
+        overflow-y: hidden;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        grid-row: 2;
+        
+    }
+    .lv {
+        height: 100%;
+        overflow-y: hidden; 
+    }
+    .browse {
+        grid-row: 3;
+    }
+
+    li.selected {
+        background: yellow
+    }
+
+
+    :host ::ng-deep .p-autocomplete-item{
+        font-size: 12px;
+    }
+    
+    :host ::ng-deep .p-autocomplete-token-label{
+        font-size: 12px;
+    }
+
+    .search-box {
+        width: 100%;
+        padding-left: 16px;
+        padding-top: 10px;
+        padding-right: 10px;
+        padding-bottom: 10px;
+
+    }
+
+    .search-input {
+        width: 100%;
+    }
+
+    .overlay {
+
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        left: 0;
+        background-color: rgba(255, 1, 1, 0);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+    }
+    
+    :host ::ng-deep .p-paginator {
+        padding: 0;
+        margin: 0;
+        /* border-top: 1px solid lightgrey; */
+        /* background-color: aqua; */
+    }
+    
+    /* :host ::ng-deep .p-orderlist-list-container {
+        border: none; */
+        
+        /* height: 100%; */
+        /* border-right: 1px dashed black;
+    } */
+
+    
+    
+
+</style>
+
+<div class="container">
+    <div class="firstpart">
+
+        <div class="search-box">
+            <span class="p-input-icon-right">
+                <i class="pi pi-search"></i>
+                <input type="text" pInputText [(ngModel)]="searchText" (ngModelChange)="searchInputChanged($event)" placeholder="Search" class="search-input">         
+            </span>
+        </div>
+        
+
+        <app-list-view-people (selectEvent)="listSelectionChange($event)" (loadEvent)="listLoadEvent($event)" [currentMode]="currentMode" class="lv" [offset]="offset" [recordsPerPage]="recordsPerPage" #listview></app-list-view-people>
+        <div>
+            <button pButton class="p-button-sm" (click)="handleMore($event)">more</button>
+        </div>
+        <p-paginator [rows]="recordsPerPage" [totalRecords]="totalRecords" [pageLinkSize]="3" (onPageChange)="paginate($event)" #paginator></p-paginator>
+    </div>
+    <div class="secondpart">
+        <div class="breadcrumb">
+            <div>
+                <p-breadcrumb [model]="items" (onItemClick)="itemClick($event)"></p-breadcrumb>
+            </div>
+            <div class="newedit-btn-container">
+                <button pButton class="p-button-sm newbtn" (click)="newButtonClick($event)">New</button>
+                <button pButton class="p-button-sm editbtn" (click)="editButtonClick($event)" [disabled]="disableEditButton">Edit</button>
+                <button pButton class="p-button-sm searchbtn">Search</button>
+                <button pButton class="p-button-sm savebtn" (click)="checkButtonClick($event)" [disabled]="disableSaveButton" #checkSaveBtn>Save</button>
+            </div>
+        </div>
+        <div class="newview">
+            <div [ngSwitch]="personView">
+                <app-new-view-people *ngSwitchCase="'New'" [personWithoutEndpoint]="selectedPerson" [currentMode]="currentMode" #newview></app-new-view-people>
+                <app-similar-people *ngSwitchCase="'Similar People'" [similarPeople]="similarPeople"></app-similar-people>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+
+
+
+
+
+<!-- <p-autoComplete  
+            [(ngModel)]="selectedCountries"
+             [suggestions]="filteredCountries" 
+             (completeMethod)="filterCountry($event)" 
+             field="name" 
+             [multiple]="true" class="autocomplete">
+            </p-autoComplete> -->

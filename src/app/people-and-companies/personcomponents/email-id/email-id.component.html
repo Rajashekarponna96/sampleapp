@@ -1,0 +1,76 @@
+<style>
+    
+
+    .superbox {
+        padding: 1em;
+        padding-left: 1em;
+        padding-top: 1em;
+        padding-right: calc(20%);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .box {
+        
+        /* padding: 1em;
+        padding-left: 1em;
+        padding-top: 1em; */
+        
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        gap: 5px;
+        
+    }
+
+    .namebox {
+        /* background-color: chartreuse; */
+        flex-grow: 1;
+        display: flex;
+        /* flex-direction: column;
+        gap: 5px; */
+    }
+    input {
+        width: 100%;
+    }
+    .buttonbox {
+        /* background-color: gold; */
+        display: flex;
+        align-items: center;
+        
+    }
+
+    
+
+
+</style>
+
+<div class="superbox">
+    
+    <div class="box">
+        <div class="namebox">
+            <!-- <input type="email" name="email" #email="ngModel" pInputText class="p-inputtext-sm fn" placeholder="email id" [(ngModel)]="endpoint.detail.emailid" autocomplete="off" required email> -->
+            <input type="email" name="email" #email="ngModel" pInputText class="p-inputtext-sm fn" placeholder="email id" [(ngModel)]="endpoint.detail.emailid" [ngModelOptions]="{standalone: true}" autocomplete="off" required email (ngModelChange)="inputChange($event)" [disabled]="whetherDisabled">
+            
+        </div>
+        <div class="buttonbox">
+            <button id="lbtn" (click)="handleDelete()" pButton class="p-button-sm menu-button" [disabled]="whetherDisabled">Delete</button>
+        </div>
+        
+    </div>
+    <ng-template [ngIf]="email.errors">
+        <small id="username2-help" class="p-error block">email id is invalid.</small>
+    </ng-template>
+
+    <span class="p-fluid">
+        <p-autoComplete [(ngModel)]="selectedTags" [ngModelOptions]="{standalone: true}" 
+        [suggestions]="filteredTags" (completeMethod)="filterTags($event)" field="tag" [multiple]="true" [dropdown]="true" (ngModelChange)="inputChange($event)">
+        </p-autoComplete>
+    </span>
+    
+</div> 
+
+
+
+
+<!-- <pre>Valid ? {{ emailIDForm.controls['emailid'].valid }}</pre> -->

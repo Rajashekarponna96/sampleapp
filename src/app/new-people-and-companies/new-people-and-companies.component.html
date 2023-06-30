@@ -1,0 +1,373 @@
+<style>
+    .container{
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto;
+      grid-template-columns: auto;
+      
+    }
+    
+    .namebox {
+        /* background-color: chartreuse; */
+        
+        width: 100%;
+        padding: 1em;
+        padding-left: 1em;
+        padding-top: 1em;
+        padding-right: calc(20%);
+
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .modifytax {
+        display: grid;
+        grid-template-areas: 'edit delete';
+        gap: 5px;
+    }
+
+    .displayline {
+        display: grid;
+        grid-template-areas: 'qty uom am';
+        gap: 5px;
+    }
+
+    /* .pcradiogroup{
+        display: grid;
+        grid-template-areas: 'rit ret';
+        gap: 5px;
+        
+    } */
+
+    
+.stocktableprogress {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        left: 0;
+        background-color: rgba(255, 1, 1, 0);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+}
+
+
+    .overlay {
+
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        left: 0;
+        background-color: rgba(255, 1, 1, 0);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+    }
+
+    .pcradiogroup{
+        
+        font-family: -apple-system, BlinkMacSystemFont, “Segoe UI”, Roboto, Helvetica,
+        Arial, sans-serif, “Apple Color Emoji”, “Segoe UI Emoji”, “Segoe UI Symbol”;
+        /* font-size: 14px; */
+
+        padding-left: 1em;
+        padding-top: 1em;
+        
+    }
+
+
+    #companyradio {
+        margin-left: 50px;
+    }
+    
+    .buttonbox {
+        padding-left: 1em;
+    }
+
+</style> 
+
+
+
+<div class="container"> 
+    
+    
+
+    
+
+    <div>Register of People & Companies</div>
+
+    <div>
+        <p-button (click)="showModalDialog()" icon="pi pi-external-link" label="New"></p-button>
+        <p-button (click)="handleMore()" icon="pi pi-external-link" label="Next"></p-button>
+    </div>
+    
+
+    <p-table [value]="people" [scrollable]="true"  
+    selectionMode="single" scrollHeight="500px" 
+        (onRowSelect)="onRowSelect($event)" dataKey="person" selectionMode="single" styleClass="p-datatable-gridlines">
+        
+        <ng-template pTemplate="header"> 
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Modify</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-person let-i="rowIndex">
+            <tr>
+                
+                <td>{{person.person}}</td>
+                <td>{{person.name}}</td>
+                <td>{{person.pc}}</td>
+                
+                <td>
+                    
+                    <div>
+                        <button pButton class="p-button-sm" (click)="handleEdit(person)">EDIT</button>
+                    </div>
+                </td>
+
+            </tr>
+        </ng-template>
+    </p-table>
+
+
+
+    <p-dialog header="Person" [(visible)]="displayNewModal" [modal]="true" [style]="{width: '100%'}"
+    [draggable]="false" [resizable]="false">
+    
+    
+        <form #f="ngForm" autocomplete="off" novalidate class="box">
+
+            <div class="pcradiogroup">
+                <p-radioButton name="pc" value="person" label="Person" [(ngModel)]="person.pc" inputId="pc1" (ngModelChange)="pcchange($event)" ></p-radioButton>
+                <p-radioButton id="companyradio" name="pc" value="company" label="Company" [(ngModel)]="person.pc" inputId="pc2" (ngModelChange)="pcchange($event)"></p-radioButton>
+            </div>
+
+            <br>
+            <br>
+            <!--personal names-->
+            <div>
+                
+
+                <ng-container *ngFor="let name of person.names; let i = index">
+                    <div *ngIf="isperson; then thenBlock else elseBlock"></div>
+                    <ng-template #thenBlock>
+                        <app-personal-name [personalName]="name" (deleteEvent)="handleDeleteOfName($event,i)" ></app-personal-name>
+                        <!-- <app-company-name [companyName]="name" (deleteEvent)="handleDeleteOfName($event)"  [currentMode]="currentMode" ></app-company-name> -->
+                    </ng-template>
+                    <ng-template #elseBlock>
+                        <app-company-name [companyName]="name" (deleteEvent)="handleDeleteOfName($event,i)"  ></app-company-name>
+                    </ng-template>
+                </ng-container> 
+
+                
+            </div>
+
+            <div class="buttonbox">
+                <button id="lbtn" (click)="handleAddName()" pButton class="p-button-sm menu-button">Add Name</button>
+            </div>
+            <br>
+            <br>
+            <br>
+            <!--email ids-->
+            <div>
+                <ng-container *ngFor="let emailid of emailids; let i = index">
+                    <app-email-id [endpoint]="emailid" (deleteEvent)="handleDeleteOfEmail($event,i)"></app-email-id>    
+                </ng-container>
+            </div>
+
+            <div class="buttonbox">
+                <button id="lbtn" (click)="handleAddEmailID()" pButton class="p-button-sm menu-button">Add EmailID</button>
+            </div>
+
+            <br>
+            <br>
+            <br>
+            <!--telephones-->
+            <div>
+                <ng-container *ngFor="let telephone of telephones; let i = index">
+                    <app-telephone [endpoint]="telephone" (deleteEvent)="handleDeleteOfTelephone($event,i)"></app-telephone>    
+                </ng-container>
+            </div>
+            <div class="buttonbox">
+                <button id="lbtn" (click)="handleAddTelephone()" pButton class="p-button-sm menu-button">Add Telephone</button>
+            </div>
+            <!--postal addresses-->
+            <div>
+                <ng-container *ngFor="let postalAddress of postalAddresses; let i = index">
+                    <app-postal-address [endpoint]="postalAddress" (deleteEvent)="handleDeleteOfPostalAddress($event,i)"></app-postal-address>
+                </ng-container>
+            </div>
+            <div class="buttonbox">
+                <button id="lbtn" (click)="handleAddAddress()" pButton class="p-button-sm menu-button">Add Address</button>
+            </div>
+            <!--govt ids-->
+            <div>
+                <ng-container *ngFor="let govtid of person.govtids; let i = index">
+                    <app-govt-id [govtid]="govtid" (deleteEvent)="handleDeleteOfGovtID($event,i)"></app-govt-id>
+                </ng-container>
+            </div>
+            <div class="buttonbox">
+                <button id="lbtn" (click)="handleAddGovtID()" pButton class="p-button-sm menu-button">Add GovtID</button>
+            </div>
+
+
+            <!-- <pre> {{person | json }} </pre> -->
+
+        </form>
+
+        <ng-template pTemplate="footer">
+            <p-button icon="pi pi-check" (click)="atleast()" label="Save" styleClass="p-button-text"></p-button>
+        </ng-template>
+
+
+        <ng-template [ngIf]="inCheckProgress">
+            <div class="overlay" id="modal">
+                <p-progressSpinner></p-progressSpinner>
+            </div>
+        </ng-template>
+        
+    </p-dialog>
+
+
+
+    <p-dialog header="Person" [(visible)]="displayEditModal" [modal]="true" [style]="{width: '100%'}"
+    [draggable]="false" [resizable]="false">
+    
+        
+        <div class="pcradiogroup">
+            <p-radioButton name="pc" value="person" label="Person" [(ngModel)]="person.pc" inputId="pc1" (ngModelChange)="pcchange($event)" [disabled]="true" ></p-radioButton>
+            <p-radioButton id="companyradio" name="pc" value="company" label="Company" [(ngModel)]="person.pc" inputId="pc2" (ngModelChange)="pcchange($event)" [disabled]="true"></p-radioButton>
+        </div>
+        <br>
+        <br>
+        <br>
+        <div>
+            <ng-container *ngFor="let name of person.names; let i = index">
+                <div *ngIf="isperson; then thenBlock else elseBlock"></div>
+                <ng-template #thenBlock>
+                    <app-personal-name [personalName]="name" [mode]="'edit'" (deleteEvent)="handleDeleteOfName($event,i)" ></app-personal-name>
+                </ng-template>
+                <ng-template #elseBlock>
+                    <app-company-name [companyName]="name" [mode]="'edit'" (deleteEvent)="handleDeleteOfName($event,i)"  ></app-company-name>
+                    <!-- <div>{{name.name}}</div>   -->
+                </ng-template>
+            </ng-container>
+        </div>
+        <br>
+        <br>
+        <br>
+        <div>
+            <ng-container *ngFor="let telephone of telephones; let i = index">
+                <!-- <div>{{ telephone.detail.telephone }}</div> -->
+                <app-telephone [endpoint]="telephone" [mode]="'edit'" (deleteEvent)="handleDeleteOfTelephone($event,i)"></app-telephone>
+            </ng-container>
+        </div>
+        <br>
+        <br>
+        <br>
+        <div>
+            <ng-container *ngFor="let emailid of emailids; let i = index">
+                <!-- <div>{{ emailid.detail.emailid }}</div> -->
+                <app-email-id [endpoint]="emailid" [mode]="'edit'" (deleteEvent)="handleDeleteOfEmail($event,i)"></app-email-id>    
+            </ng-container>
+        </div>
+        <br>
+        <br>
+        <br>
+
+        <div>
+            <ng-container *ngFor="let address of postalAddresses; let i = index">
+                <!-- <div>{{ emailid.detail.emailid }}</div> -->
+                <app-postal-address [endpoint]="address" [mode]="'edit'" (deleteEvent)="handleDeleteOfPostalAddress($event,i)"></app-postal-address>
+            </ng-container>
+        </div>
+        <br>
+        <br>
+        <br>
+        <div>
+            <ng-container *ngFor="let govtid of person.govtids; let i = index">
+                <app-govt-id [govtid]="govtid" (deleteEvent)="handleDeleteOfGovtID($event,i)"></app-govt-id>
+            </ng-container>
+        </div>
+        <div class="buttonbox">
+            <button id="lbtn" (click)="handleAddGovtID()" pButton class="p-button-sm menu-button">Add GovtID</button>
+        </div>
+        <div>
+            <!-- <pre>{{person | json }}</pre> -->
+        </div>
+
+
+        <ng-template pTemplate="footer">
+            <p-button icon="pi pi-check" (click)="updatePerson()" label="Update" styleClass="p-button-text"></p-button>
+        </ng-template>
+
+
+        <ng-template [ngIf]="inCheckProgress">
+            <div class="overlay" id="modal">
+                <p-progressSpinner></p-progressSpinner>
+            </div>
+        </ng-template>
+
+
+    </p-dialog>
+
+
+    <p-dialog header="Similar People" [(visible)]="displaySimilarModal" [modal]="true" [style]="{width: '100%'}" [draggable]="false" [resizable]="false">
+        
+
+        <div class="card">
+
+            <p-dataView [value]="similarPeople" layout="list" [paginator]="true" [rows]="25" [style]="{'height':'100%'}">
+                <ng-template let-product pTemplate="listItem">
+                    <div class="col-12">
+                        <div class="product-list-item">
+                            <!-- <img [src]="'assets/showcase/images/demo/product/' + product.image" [alt]="product.name"/> -->
+                            <div class="product-list-detail">
+                                <div>person id: {{product.personid}}</div>
+                                <div class="product-name">{{product.name}}</div>
+                                <div class="product-name">{{product.endpoint}}</div>
+                                <div class="product-description">{{product.similarity}}</div>
+                                <!-- <p-rating [ngModel]="product.rating" [readonly]="true" [cancel]="false"></p-rating>
+                                <i class="pi pi-tag product-category-icon"></i><span class="product-category">{{product.category}}</span> -->
+                            </div>
+                            
+                        </div>
+                    </div>
+                </ng-template>
+            </p-dataView>
+
+        </div>
+
+
+        <ng-template pTemplate="footer">
+            <!-- <p-button icon="pi pi-check" (click)="handleCheckPerson()" label="Save" styleClass="p-button-text"></p-button> -->
+            <p-button (click)="saveAsNewPerson()" icon="pi pi-external-link" label="Save As New"></p-button>
+        </ng-template>
+
+        <ng-template [ngIf]="inCheckProgress">
+            <div class="overlay" id="modal">
+                <p-progressSpinner></p-progressSpinner>
+            </div>
+        </ng-template>
+
+    </p-dialog>
+
+
+    <p-dialog header="error" [(visible)]="displayErrorModal" [modal]="true" [draggable]="false" [resizable]="false">
+        <div>One or more name and endpoint combinations already exist.</div>
+    </p-dialog>
+
+
+    <p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+
+
+</div>

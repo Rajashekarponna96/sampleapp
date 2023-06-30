@@ -1,0 +1,180 @@
+<style>
+    .container{
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto;
+      grid-template-columns: auto;
+      
+    }
+    
+    .namebox {
+        /* background-color: chartreuse; */
+        
+        width: 100%;
+        padding: 1em;
+        padding-left: 1em;
+        padding-top: 1em;
+        padding-right: calc(20%);
+
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .modifytax {
+        display: grid;
+        grid-template-areas: 'edit delete';
+        gap: 5px;
+    }
+
+    .displayline {
+        display: grid;
+        grid-template-areas: 'qty uom am';
+        gap: 5px;
+    }
+
+    .pcradiogroup{
+        display: grid;
+        grid-template-areas: 'rit ret';
+        gap: 5px;
+        
+    }
+
+    
+.stocktableprogress {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        left: 0;
+        background-color: rgba(255, 1, 1, 0);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+}
+
+
+    .overlay {
+
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        left: 0;
+        background-color: rgba(255, 1, 1, 0);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+    }
+
+</style>
+
+    
+
+
+
+
+<div class="container"> 
+    
+    
+    <div></div>
+    <div>Register of Tags</div>
+
+    <p-button (click)="showModalDialog()" icon="pi pi-external-link" label="New"></p-button>
+
+    <div class="card">
+        <p-table [value]="tags" [scrollable]="true"  
+        selectionMode="single" scrollHeight="500px" 
+         (onRowSelect)="onRowSelect($event)" dataKey="recordid" selectionMode="single" styleClass="p-datatable-sm">
+            
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>Id</th>
+                    <th>Tag</th>
+                    
+                    <th>Modify</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-v let-i="rowIndex">
+                <tr>
+                    <td>{{v.id}}</td>
+                    <td>{{v.tag}}</td>
+                    
+                    <td>
+                        <div class="displayline">
+                            <button pButton class="p-button-sm" (click)="handleDeleteTag(i)">VIEW</button>
+                        </div>
+                        
+                    </td>
+                    
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+
+    <p-dialog header="Tag" [(visible)]="displayModal" [modal]="true" [style]="{width: '100%'}"
+        [draggable]="false" [resizable]="false">
+    
+    
+        <div class="formbox">
+    
+            <form #f="ngForm" autocomplete="off" novalidate class="box">
+        
+                <div class="ahinputbox">
+                    <input type="text" 
+                    #itemTitle="ngModel" 
+                    pInputText 
+                    class="p-inputtext-sm" 
+                    placeholder="enter tag" 
+                    [ngModelOptions]="{standalone: true}"
+                     [(ngModel)]="tag.tag" 
+                     autocomplete="off" 
+                     minlength="3" 
+                     required 
+                     (ngModelChange)="inputChange($event)" 
+                     >
+                    <ng-template [ngIf]="itemTitle.errors">
+                        <small id="username2-help" class="p-error block">tag is required and must be atleast 3 letters</small>
+                    </ng-template>
+                </div>
+                
+                
+                
+    
+            </form>
+        
+            <!-- <pre>{{item | json}}</pre>
+            <pre>{{itemTitle.errors | json}}</pre>
+            <pre>{{ selectUOM.errors | json}}</pre>
+            <pre>SELECTED TAX {{selectedTax | json}}</pre>
+    
+            <pre>TAX FORM VALID ? {{ (taxName.errors || taxPercent.errors || selectTaxType.errors) || disableControls ? true : false}}</pre>
+         -->
+        </div>
+    
+
+
+        
+        <ng-template pTemplate="footer">
+            <p-button icon="pi pi-check" (click)="handleSave()" label="Save" styleClass="p-button-text"></p-button>
+        </ng-template>
+    </p-dialog>
+    
+    
+    
+
+    <p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+
+
+    <ng-template [ngIf]="inProgress">
+        <div class="overlay" id="modal">
+            <p-progressSpinner></p-progressSpinner>
+        </div>
+    </ng-template>
+
+
+    
+</div>  

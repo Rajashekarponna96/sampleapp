@@ -1,0 +1,81 @@
+
+      <p-radioButton name="personCompany" value="person" label="Person" [(ngModel)]="selectedOption" (onClick)="resetNamesArray('person')"></p-radioButton>
+      <p-radioButton name="personCompany" value="company" label="Company" [(ngModel)]="selectedOption" (onClick)="resetNamesArray('company')"></p-radioButton>
+  
+      
+
+    <form [formGroup]="form">
+        <ng-container *ngIf="selectedOption === 'person'">
+            <div formGroupName="personalName">
+              <label>First Name:</label>
+              <input type="text" formControlName="firstName">
+              <label>Middle Name:</label>
+              <input type="text" formControlName="middleName">
+              <label>Last Name:</label>
+              <input type="text" formControlName="lastName">
+            </div>
+    
+            
+          </ng-container>
+          <ng-container *ngIf="selectedOption === 'company'">
+            <div formGroupName="companyName">
+              <label>Company Name:</label>
+              <input type="text" formControlName="name">
+            </div>
+          </ng-container>
+
+          
+    </form>
+  
+      <button (click)="addName()">Add Name</button>
+      <div *ngFor="let name of namesArray; index as i">
+        <div>
+          <ng-container *ngIf="selectedOption === 'person'">
+            {{ name.firstName }} {{ name.middleName }} {{ name.lastName }}
+          </ng-container>
+          <ng-container *ngIf="selectedOption === 'company'">
+            {{ name.name }}
+          </ng-container>
+          <button (click)="deleteName(i)">Delete</button>
+        </div>
+      </div>
+
+
+
+      <!-- <form [formGroup]="form">
+        <div>
+          <p-radioButton name="selectedOption" value="person" formControlName="selectedOption"></p-radioButton>
+          <label for="person">Person</label>
+          <p-radioButton name="selectedOption" value="company" formControlName="selectedOption"></p-radioButton>
+          <label for="company">Company</label>
+        </div>
+        <ng-container *ngIf="form.get('selectedOption').value === 'person'">
+          <div formArrayName="personNames">
+            <div *ngFor="let name of form.get('personNames').controls; index as i">
+              <div [formGroupName]="i">
+                <p-input placeholder="First Name" formControlName="firstName"></p-input>
+                <p-input placeholder="Middle Name" formControlName="middleName"></p-input>
+                <p-input placeholder="Last Name" formControlName="lastName"></p-input>
+                <button (click)="deleteName(i)">Delete</button>
+              </div>
+            </div>
+            <button (click)="addName('personNames')">Add Name</button>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="form.get('selectedOption').value === 'company'">
+          <div formArrayName="companyNames">
+            <div *ngFor="let name of form.get('companyNames').controls; index as i">
+              <div [formGroupName]="i">
+                <p-input placeholder="Company Name" formControlName="name"></p-input>
+                <button (click)="deleteName(i)">Delete</button>
+              </div>
+            </div>
+            <button (click)="addName('companyNames')">Add Name</button>
+          </div>
+        </ng-container>
+      </form> -->
+      
+      
+      
+    
+  

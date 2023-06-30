@@ -1,0 +1,247 @@
+<style>
+    
+    .superbox {
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+        display: grid;
+        grid-template-rows: auto 1fr;
+        grid-template-columns: 1fr;
+
+    }
+
+    .breadcrumb {
+        grid-row: 1;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        
+    }
+
+    .formbox {
+        grid-row: 2;
+        height: 100%;
+        overflow: auto;
+
+    }
+
+    .box {
+        
+        width: 100%;
+        padding: 1em;
+        padding-left: 1em;
+        padding-top: 1em;
+        padding-right: calc(20%);
+        
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        
+    }
+
+    .ahinputbox {
+        /* background-color: chartreuse; */
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+    }
+
+
+    input {
+        width: 100%;
+    }
+
+    
+    .check-label {
+        display: flex;
+        flex-direction: row;
+        gap: 15px;
+    }
+
+    .field-checkbox {
+        gap:5px
+    }
+    
+    .newedit-btn-container {
+        background-color: #efefef;
+        display: flex;
+        grid-column: 2;
+        align-items: center;
+    }
+
+    .newbtn {
+        margin-right: 5px;
+    }
+
+    .editbtn {
+        margin-right: 5px;
+        
+    }
+    .savebtn {
+        margin-right: 20px;
+    }
+
+    .searchbtn {
+        margin-right: 5px;
+    }
+
+    .namebox {
+        /* background-color: chartreuse; */
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+
+</style>
+
+<p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+
+<div class="superbox">
+    <div class="breadcrumb">
+        <div>
+            <p-breadcrumb [model]="items" (onItemClick)="itemClick($event)"></p-breadcrumb>
+        </div>
+        <div class="newedit-btn-container">
+            <button pButton class="p-button-sm newbtn" (click)="newOtherAccountButtonClick($event)">New Item</button>
+            <button pButton class="p-button-sm editbtn" (click)="editButtonClick($event)" [disabled]="disableEditButton">Edit</button>
+            <button pButton class="p-button-sm searchbtn">Search</button>
+            <button pButton class="p-button-sm savebtn" (click)="saveButtonClick($event)" [disabled]="disableSaveButton" #checkSaveBtn>Save</button>
+        </div>
+    </div>
+    
+    
+    <div class="formbox">
+    
+        <form #f="ngForm" autocomplete="off" novalidate class="box">
+    
+            <div class="ahinputbox">
+                <input type="text" 
+                #itemTitle="ngModel" 
+                pInputText 
+                class="p-inputtext-sm" 
+                placeholder="enter item name" 
+                [ngModelOptions]="{standalone: true}"
+                 [(ngModel)]="item.itemname" 
+                 autocomplete="off" 
+                 minlength="3" 
+                 required 
+                 (ngModelChange)="inputChange($event)" 
+                 [disabled]="disableControls">
+                <ng-template [ngIf]="itemTitle.errors">
+                    <small id="username2-help" class="p-error block">item name is required and must be atleast 3 letters</small>
+                </ng-template>
+            </div>
+            
+            <div class="field-checkbox">
+                <p-checkbox [(ngModel)]="item.isgroup" [binary]="true" inputId="binary" [ngModelOptions]="{standalone: true}" [disabled]="disableControls"></p-checkbox>
+                <div class="check-label">
+                    <label for="binary">Is Group?</label>
+                    <div>{{ item.isgroup }}</div>
+                </div>    
+            </div>
+        
+            <!-- <div>
+                <p-dropdown #selectAccountType="ngModel" [options]="defaultGroups" [(ngModel)]="accountHead.defaultgroup" optionLabel="type" optionValue="type" [ngModelOptions]="{standalone: true}" [required]="true"></p-dropdown>
+                <ng-template [ngIf]="selectAccountType.errors">
+                    <small id="username2-help" class="p-error block">you must select a default account group</small>
+                </ng-template>
+            </div> -->
+
+
+            <div>
+                <p-autoComplete
+                    [(ngModel)]="selectedUOM"
+                    [suggestions]="filteredUOMs" 
+                    (completeMethod)="filterUOMs($event)"
+                    field="uom" 
+                    [multiple]="false" class="autocomplete" 
+                    (onSelect)="handleOnSelect($event)"
+                    [style]="{'width':'100%'}"
+                    [inputStyle]="{'width':'100%'}" 
+                    [placeholder]="placeholder" 
+                    [ngModelOptions]="{standalone: true}"
+                    (ngModelChange)="UOMChange($event)"
+                    [required]="true" #selectUOM="ngModel" 
+                    [forceSelection]="true" [disabled]="disableControls">
+                </p-autoComplete>
+                <ng-template [ngIf]="selectUOM.errors">
+                    <small id="username2-help" class="p-error block">you must select a unit of measurement</small>
+                </ng-template>
+
+            </div>
+
+
+            <p>Taxes</p>
+
+            <!--styleClass="p-datatable-sm"-->
+
+            <div class="card">
+                <p-table [value]="item.taxes" [scrollable]="true"  
+                selectionMode="single" scrollHeight="200px" 
+                 (onRowSelect)="onRowSelect($event)" dataKey="recordid" selectionMode="single" styleClass="p-datatable-sm">
+                    <!--[style]="{'width':'320px'}"-->
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th style="width: 3rem"></th>
+                            <th>Name</th>
+                            <th>Code</th>
+                            <th>Percent</th>
+                            <th>Type</th>
+                            <th>Authority</th>
+                            <th>Modify</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-tax let-i="rowIndex">
+                        <tr>
+                            <td>
+                                <p-tableRadioButton [value]="tax"></p-tableRadioButton>
+                            </td>
+                            <td>{{tax.taxname}}</td>
+                            <td>{{tax.taxcode}}</td>
+                            <td>{{tax.taxpercent}}</td>
+                            <td>{{tax.taxtype}}</td>
+                            <td>{{tax.taxauthority.accounthead}}</td>
+                            <td><button pButton class="p-button-sm" (click)="handleDelete(i)" [disabled]="disableControls">DEL</button></td>
+                            
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+
+
+
+            <div class="namebox">
+                <input type="text" #taxName="ngModel" #taxNameInput pInputText class="p-inputtext-sm fn" placeholder="tax name" [(ngModel)]="selectedTax.taxname" [ngModelOptions]="{standalone: true}"  autocomplete="off" required [disabled]="disableControls">
+                <input type="text" #taxCode="ngModel" pInputText class="p-inputtext-sm" placeholder="tax code" [(ngModel)]="selectedTax.taxcode" [ngModelOptions]="{standalone: true}"  autocomplete="off" [disabled]="disableControls">
+                <input type="number" #taxPercent="ngModel" pInputText class="p-inputtext-sm" placeholder="tax percent" [(ngModel)]="selectedTax.taxpercent" [ngModelOptions]="{standalone: true}"  autocomplete="off" required [disabled]="disableControls">
+                <p-dropdown #selectTaxType="ngModel" [options]="taxTypes" [(ngModel)]="selectedTax.taxtype" optionLabel="type" optionValue="type" [ngModelOptions]="{standalone: true}" [required]="true" [disabled]="disableControls"></p-dropdown>
+            </div>
+
+
+            <div>
+                <button pButton class="p-button-sm" (click)="handleNewTax()" [disabled]="(taxName.errors || taxPercent.errors || selectTaxType.errors) || disableControls" >Add Tax</button>
+                <button pButton class="p-button-sm" (click)="clearTaxForm()" [disabled]="disableControls" >Clear</button>
+            </div>
+            
+
+        </form>
+    
+        <pre>{{item | json}}</pre>
+        <pre>{{itemTitle.errors | json}}</pre>
+        <pre>{{ selectUOM.errors | json}}</pre>
+        <pre>SELECTED TAX {{selectedTax | json}}</pre>
+
+        <pre>TAX FORM VALID ? {{ (taxName.errors || taxPercent.errors || selectTaxType.errors) || disableControls ? true : false}}</pre>
+    
+    </div> 
+</div>
+
+
+
+<ng-template [ngIf]="inProgress">
+    <div class="overlay" id="modal">
+        <p-progressSpinner></p-progressSpinner>
+    </div>
+</ng-template>

@@ -1,0 +1,81 @@
+<style>
+
+    /* .listview {
+        background-color: aqua;
+    } */
+
+    /* .orderlist {
+        height: 100%;
+        overflow-y: hidden;
+    } */
+
+    /* :host ::ng-deep .p-element {
+        height: 100%;
+        overflow-y: hidden;
+    } */
+
+    :host ::ng-deep .p-orderlist-controls {
+        display: none !important;
+    }
+
+    :host ::ng-deep .p-orderlist  {
+        height: 100%;
+        overflow-y: auto;
+    }
+    
+    :host ::ng-deep .p-orderlist-filter-container  {
+        display:none;
+        border: none;
+        border-bottom: 1px solid lightgray;
+        /* height: 100%; */
+        padding: 10px;
+    }
+
+    :host ::ng-deep .p-orderlist-list  {
+        border: none;
+        border-top: 1px solid lightgrey;
+        height: 100%;
+        overflow-y: auto;
+        
+    }
+
+
+
+
+    .overlay {
+
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        left: 0;
+        background-color: rgba(255, 1, 1, 0);
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+    }
+
+
+
+</style>
+
+
+
+<p-orderList [value]="people" filterBy="name,pc" (onSelectionChange)="selectionChange($event)" [(selection)]="selectedRows" [style]="{'height':'100%'}">
+    <ng-template let-car pTemplate="item">
+        <div>
+            <div style="font-size:14px;">{{car.name}}</div>
+        </div>
+    </ng-template>
+</p-orderList>
+
+
+
+
+<ng-template [ngIf]="inProgress">
+    <div class="overlay" id="modal">
+        <p-progressSpinner></p-progressSpinner>
+    </div>
+</ng-template>

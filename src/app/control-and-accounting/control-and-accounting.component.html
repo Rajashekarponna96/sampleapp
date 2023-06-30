@@ -1,0 +1,28 @@
+<style>
+    button {
+         
+       margin-top: 50px; 
+       margin-left: 20px;
+       margin-right: 5px;
+    }
+</style>
+
+<div class="container">
+    <ng-template [ngIf]="lo.digitalkey.sales.view"><button pButton class="p-button-sm" (click)="handleSales()">Sales</button></ng-template>
+    <ng-template [ngIf]="lo.digitalkey.purchases.view"><button pButton class="p-button-sm" (click)="handlePurchases()">Purchases</button></ng-template>
+    <ng-template [ngIf]="lo.digitalkey.salesreturns.view"><button pButton class="p-button-sm" (click)="handleSaleReturn()">Sale Return</button></ng-template>
+    <ng-template [ngIf]="lo.digitalkey.purchasereturns.view"><button pButton class="p-button-sm" (click)="handlePurchaseReturn()">Purchase Return</button></ng-template>
+    <ng-template [ngIf]="lo.digitalkey.payments.view"><button pButton class="p-button-sm" (click)="handlePayments()">Payments</button></ng-template>
+    <ng-template [ngIf]="lo.digitalkey.receipts.view"><button pButton class="p-button-sm" (click)="handleReceipts()">Receipts</button></ng-template>
+    <ng-template [ngIf]="lo.digitalkey.bankreconciliation.view"><button pButton class="p-button-sm" (click)="handleBRS()">Bank Reconciliation</button></ng-template>
+    <ng-template [ngIf]="lo.digitalkey.production.view"><button pButton class="p-button-sm" (click)="handleProduction()">Production</button></ng-template>
+    <ng-template [ngIf]="lo.digitalkey.consumption.view"><button pButton class="p-button-sm" (click)="handleConsumption()">Consumption</button></ng-template>
+    <ng-template [ngIf]="lo.digitalkey.journalvoucher.view"><button pButton class="p-button-sm" (click)="handleJournalVoucher()">Journal Voucher</button></ng-template>
+    <button pButton class="p-button-sm" (click)="handleLineProduction()">Line Production</button>
+    <button pButton class="p-button-sm">Conversion</button>
+    <button pButton class="p-button-sm" (click)="handleTransfer()">Transfer</button>
+    <button pButton class="p-button-sm" (click)="handleNewJournalVoucher()">New Journal Voucher</button>
+    
+</div>
+
+<p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle"></p-confirmDialog>

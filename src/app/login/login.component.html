@@ -1,0 +1,89 @@
+<style>
+   
+    .parent {
+        width: 100%;
+        height: 100%;
+        background-color: #f9faf8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .child {
+        
+        width: 30%;
+        margin: 0 auto;
+        padding: 10px;
+    }
+
+    .cardpanel {
+        padding: 20px;
+    }
+
+    input {
+        width: 100%;
+    }
+
+    .button-box {
+        display:flex;
+        justify-content: flex-end;
+        
+    }
+    
+    
+    
+    
+</style>
+
+<div class="parent">
+    
+    <form [formGroup]="loginForm" autocomplete="off" novalidate (ngSubmit)="handleLogin($event)" class="child">
+        <div class="p-card cardpanel">
+            <div class="field">
+                <label for="endpoint" class="block">Endpoint</label>
+                <input id="endpoint" type="text" aria-describedby="endpoint-help" pInputText class="p-inputtext-sm" formControlName="endpoint"/>
+                <small id="endpoint-help" class="block">Enter your telephone or email-id.</small>
+            </div>   
+            
+    
+            <div class="field">
+                <label for="password" class="block">Password</label>
+                <input id="password" type="password" name="password" formControlName="password" pInputText class="p-inputtext-sm"/>
+            </div>
+            <div class="field">
+                <label for="schema" class="block">Business ID:</label>
+                <input id="schema" type="text" name="schema" formControlName="schema" pInputText class="p-inputtext-sm"/>
+                <small id="schema-help" class="block">Enter your business id. For ex. sdb01</small>
+            </div>
+            <div class="field">
+                <label for="database" class="block">Database:</label>
+                <input id="database" type="text" placeholder="enter database" name="database" formControlName="database" pInputText class="p-inputtext-sm"/>
+                <small id="schema-help" class="block">Enter your database. For ex. db01</small>
+            </div>
+            <div class="field">
+                <label for="appurl" class="block">App URL:</label>
+                <input id="appurl" type="text" name="appurl" formControlName="appurl" pInputText class="p-inputtext-sm"/>
+                
+            </div>
+            <div class="button-box">
+                <button type="submit" pButton class="p-button-sm">Login</button>
+            </div>
+            
+        </div>
+        
+    </form>
+
+</div>
+
+
+
+
+
+<!-- <pre>{{ loginForm.value | json}}</pre> -->
+
+
+
+
+
+
+

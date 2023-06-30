@@ -1,0 +1,47 @@
+<style>
+    .container{
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      /* display: grid;
+      grid-template-rows: auto;
+      grid-template-columns: auto; */
+      
+    }
+
+    button {
+         
+       margin-top: 50px; 
+       margin-left: 20px;
+       margin-right: 5px;
+    }
+</style>
+
+<div class="container">
+  
+    
+
+    
+    
+    <ng-template [ngIf]="lo.digitalkey.generalledger.view"><button pButton class="p-button-sm" (click)="handleGeneralLedger()">General Ledger</button></ng-template>
+
+    <button pButton class="p-button-sm">Trial Balance</button>
+
+    
+    
+    <ng-template [ngIf]="lo.digitalkey.stockregister.view"><button pButton class="p-button-sm" (click)="handleStockRegister()">Stock Register</button></ng-template>
+    <ng-template [ngIf]="lo.digitalkey.trailingfinalaccounts.view"><button pButton class="p-button-sm" (click)="handleTrailingFinalAccounts()">Trailing Final Accounts</button></ng-template>
+    <ng-template [ngIf]="lo.digitalkey.recipecostlist.view"><button pButton class="p-button-sm" (click)="handleRecipeCostList()">Recipe Cost List</button></ng-template>
+    
+    <ng-template [ngIf]="lo.digitalkey.finalaccounts.view"><button pButton class="p-button-sm" (click)="handlePenultimateAccounts()">Final Accounts</button></ng-template> 
+    <ng-template [ngIf]="lo.digitalkey.closingstock.view"><button pButton class="p-button-sm" (click)="handleClosingStock()">Item Movement Register</button></ng-template>
+    
+    <button pButton class="p-button-sm" (click)="handleSaleInvoiceAgeingList()">Sale Invoice Ageing List</button>
+    <button pButton class="p-button-sm" (click)="handlePurchaseInvoiceAgeingList()">Purchase Invoice Ageing List</button>
+
+    <!-- <button pButton class="p-button-sm" (click)="handlePenultimateAccounts()">Final Accounts</button> -->
+
+    <!-- <button pButton class="p-button-sm" (click)="handleResourceTracker()">Resource Tracker</button> -->
+    <ng-template [ngIf]="lo.digitalkey.resourcetracker.view"><button pButton class="p-button-sm" (click)="handleResourceTracker()">Resource Tracker</button></ng-template>
+
+</div> 

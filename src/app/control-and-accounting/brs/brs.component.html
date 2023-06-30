@@ -1,0 +1,360 @@
+<style>
+    .container{
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto;
+      grid-template-columns: auto;
+      
+    }
+    
+    .namebox {
+        /* background-color: chartreuse; */
+        
+        width: 100%;
+        padding: 1em;
+        padding-left: 1em;
+        padding-top: 1em;
+        padding-right: calc(20%);
+
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .modifytax {
+        display: grid;
+        grid-template-areas: 'edit delete';
+        gap: 5px;
+    }
+
+    .displayline {
+        display: grid;
+        grid-template-areas: 'qty uom am';
+        gap: 5px;
+    }
+
+    .pcradiogroup{
+        display: grid;
+        grid-template-areas: 'rit ret';
+        gap: 5px;
+        
+    }
+
+    
+.stocktableprogress {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        left: 0;
+        background-color: rgba(255, 1, 1, 0);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+}
+
+
+    .overlay {
+
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        left: 0;
+        background-color: rgba(255, 1, 1, 0);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+    }
+
+</style>
+
+
+<div class="container">
+
+    
+    <div>Bank Reconciliation</div>
+
+    <div class="namebox">
+        <div>Bank</div>
+        <p-autoComplete
+            [(ngModel)]="selectedBankParty"
+            [suggestions]="filteredBankParties" 
+            (completeMethod)="filterBankParties($event)"
+            field="accounthead" 
+            [multiple]="false" class="autocomplete" 
+            (onSelect)="handleOnSelectBankParty($event)"
+            [style]="{'width':'100%'}"
+            [inputStyle]="{'width':'100%'}" 
+            [placeholder]="placeholderBankParty" 
+            [ngModelOptions]="{standalone: true}"
+            (ngModelChange)="bankPartyChange($event)"
+            [required]="true" #selectBankParty="ngModel" 
+            [forceSelection]="true">
+
+            <ng-template let-selectedBankParty pTemplate="item">
+                <div>{{selectedBankParty.accounthead}} - {{selectedBankParty.id}}</div>
+                <div>{{selectedBankParty.endpoint}}</div>
+            </ng-template>
+
+        </p-autoComplete>
+        <ng-template [ngIf]="selectBankParty.errors">
+            <small id="username2-help" class="p-error block">you must select a bank</small>
+        </ng-template>
+
+    </div>
+
+
+    
+
+    <p-table [value]="BRSSummaryList" [scrollable]="true"  
+    selectionMode="single" scrollHeight="500px" 
+        (onRowSelect)="onRowSelect($event)" dataKey="recordid" selectionMode="single" styleClass="p-datatable-gridlines">
+        
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Title</th>
+                <th>Value</th>
+                <th>Modify</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-asp let-i="rowIndex">
+            <tr>
+                
+                <td>{{asp.title}}</td>
+                <td>{{asp.value}}</td>
+                
+                <td>
+                    <div>
+                        <button pButton class="p-button-sm" (click)="handleView(asp)">VIEW</button>
+                    </div>
+                </td>
+
+            </tr>
+        </ng-template>
+    </p-table>
+
+    <p-dialog header="Cheques on Hand" [(visible)]="chequesOnHandModal" [modal]="true" [style]="{width: '100%',height:'100%'}">
+        
+        <div class="pcradiogroup">       
+            <p-button (click)="handleDeposit()" label="Deposit"></p-button>
+            <p-button (click)="handleMoreCOH()" label="Next"></p-button>
+        </div>
+
+        <p-table [value]="chequesList" [scrollable]="true"  
+    selectionMode="single" scrollHeight="500px"
+        (onRowSelect)="onRowSelect($event)" dataKey="id" [(selection)]="selectedChequesForDeposit" selectionMode="multiple" styleClass="p-datatable-gridlines">
+        
+        <ng-template pTemplate="header"> 
+            <tr>
+                <th style="width: 1rem">
+                    select
+                </th>
+                <th>Date</th>
+                <th>Party</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Modify</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-ch let-i="rowIndex">
+            <tr>
+                <td>
+                    <p-tableCheckbox [value]="ch"></p-tableCheckbox>
+                </td>
+                <td>{{ch.maturitydate}}</td>
+                <td>{{ch.originalparty.accounthead}}</td>
+                <td>{{ch.amount}}</td>
+                <td>{{ch.status}}</td>
+                <td>
+                    <div>
+                        <button pButton class="p-button-sm" (click)="handleView(ch)">VIEW</button>
+                    </div>
+                </td>
+
+            </tr>
+        </ng-template>
+        </p-table>
+    </p-dialog>
+
+    <p-dialog header="Cheques deposited but not yet credited" [(visible)]="chequesDepositedModal" [modal]="true" [style]="{width: '100%',height:'100%'}">
+        
+        <div class="pcradiogroup">       
+            <!-- <p-button (click)="handleClearDepositedCheque()" label="Clear"></p-button> -->
+            <p-button (click)="handleReturn()" label="Return"></p-button>
+            <p-button (click)="handleMoreCDBYNC()" label="Next"></p-button>
+        </div>
+        
+        <p-table [value]="chequesList" [scrollable]="true"  
+    selectionMode="single" scrollHeight="500px"
+        (onRowSelect)="onRowDepositSelect($event)" dataKey="id" [(selection)]="selectedChequesForReturn" 
+        selectionMode="multiple" styleClass="p-datatable-gridlines">
+        
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width: 1rem">
+                    select
+                </th>
+                <th>Date</th>
+                <th>Party</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Modify</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-ch let-i="rowIndex">
+            <tr>
+                <td>
+                    <p-tableCheckbox [value]="ch"></p-tableCheckbox>
+                </td>
+                <td>{{ch.maturitydate}}</td>
+                <td>{{ch.originalparty.accounthead}}</td>
+                <td>{{ch.amount}}</td>
+                <td>{{ch.status}}</td>
+                <td>
+                    <div>
+                        <button pButton class="p-button-sm" (click)="handleView(ch)">VIEW</button>
+                        <p-button (click)="handleClearDepositedCheque(ch)" label="Clear"></p-button>
+                    </div>
+                </td>
+
+            </tr>
+        </ng-template>
+        </p-table>
+    </p-dialog>
+
+    <p-dialog header="Cheques returned" [(visible)]="chequesReturnedModal" [modal]="true" [style]="{width: '100%',height:'100%'}">
+        
+        <div>
+            <p-button (click)="handleMoreRC()" label="Next"></p-button>
+        </div>
+        
+        <p-table [value]="chequesList" [scrollable]="true"  
+    selectionMode="single" scrollHeight="500px"
+        (onRowSelect)="onRowDepositSelect($event)" dataKey="id"  
+         styleClass="p-datatable-gridlines">
+        
+        <ng-template pTemplate="header">
+            <tr>
+                
+                <th>Date</th>
+                <th>Party</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Modify</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-ch let-i="rowIndex">
+            <tr>
+                
+                <td>{{ch.maturitydate}}</td>
+                <td>{{ch.originalparty.accounthead}}</td>
+                <td>{{ch.amount}}</td>
+                <td>{{ch.status}}</td>
+                <td>
+                    <div class="pcradiogroup">
+                        <button pButton class="p-button-sm" (click)="handleView(ch)">VIEW</button>
+                        <button pButton class="p-button-sm" (click)="handleReturnToParty(ch)">RETURN TO PARTY</button>
+                    </div>
+                </td>
+
+            </tr>
+        </ng-template>
+        </p-table>
+    </p-dialog>
+
+    <p-dialog header="Cheques written but not yet issued" [(visible)]="chequesWrittenModal" [modal]="true" [style]="{width: '100%',height:'100%'}">
+        
+        <div>
+            <p-button (click)="handleMoreCWBNYITP()" label="Next"></p-button>
+        </div>
+        
+        <p-table [value]="chequesList" [scrollable]="true"  
+    selectionMode="single" scrollHeight="500px"
+        (onRowSelect)="onRowDepositSelect($event)" dataKey="id"  
+         styleClass="p-datatable-gridlines">
+        
+        <ng-template pTemplate="header">
+            <tr>
+                
+                <th>Date</th>
+                <th>Party</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Modify</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-ch let-i="rowIndex">
+            <tr>
+                
+                <td>{{ch.maturitydate}}</td>
+                <td>{{ch.originalparty.accounthead}}</td>
+                <td>{{ch.amount}}</td>
+                <td>{{ch.status}}</td>
+                <td>
+                    <div class="displayline">
+                        <button pButton class="p-button-sm" (click)="handleView(ch)">VIEW</button>
+                        <p-button (click)="handleCancelWrittenCheque(ch)" label="Cancel"></p-button>
+                    </div>
+                </td>
+
+            </tr>
+        </ng-template>
+        </p-table>
+    </p-dialog>
+
+    <p-dialog header="Cheques issued but not yet debited" [(visible)]="chequesIssuedModal" [modal]="true" [style]="{width: '100%',height:'100%'}">
+        
+        <div>
+            <p-button (click)="handleMoreCIBNYDBTB()" label="Next"></p-button>
+        </div>
+        
+        <p-table [value]="chequesList" [scrollable]="true"  
+    selectionMode="single" scrollHeight="500px"
+        (onRowSelect)="onRowDepositSelect($event)" dataKey="id"  
+         styleClass="p-datatable-gridlines">
+        
+        <ng-template pTemplate="header">
+            <tr>
+                
+                <th>Date</th>
+                <th>Party</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Modify</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-ch let-i="rowIndex">
+            <tr>
+                
+                <td>{{ch.maturitydate}}</td>
+                <td>{{ch.originalparty.accounthead}}</td>
+                <td>{{ch.amount}}</td>
+                <td>{{ch.status}}</td>
+                <td>
+                    <div class="displayline">
+                        <button pButton class="p-button-sm" (click)="handleView(ch)">VIEW</button>
+                        <button pButton class="p-button-sm" (click)="handleReturnByParty(ch)">RETURN BY PARTY</button>
+                        <p-button (click)="handleClearIssuedCheque(ch)" label="Clear"></p-button>
+                    </div>
+                </td>
+
+            </tr>
+        </ng-template>
+        </p-table>
+    </p-dialog>
+
+    <p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+
+    <ng-template [ngIf]="inProgress"> 
+        <div class="overlay" id="modal">
+            <p-progressSpinner></p-progressSpinner>
+        </div>
+    </ng-template>
+
+
+</div>
+

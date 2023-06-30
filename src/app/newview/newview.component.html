@@ -1,0 +1,68 @@
+
+
+
+
+<!-- <p-card class="p-m-2 p-p-4 p-mb-4 p-d-flex p-flex-wrap p-jc-between">
+    <ng-template pTemplate="header">
+      <h2>Card Header</h2>
+    </ng-template>
+    <ng-template pTemplate="content">
+      <p>Card Content</p>
+      <div class="card">
+        <p-table [value]="sanitizedInvoiceList" [scrollable]="true"  
+        selectionMode="single" scrollHeight="500px" 
+            (onRowSelect)="onRowSelect($event)" dataKey="recordid" selectionMode="single" styleClass="p-datatable-gridlines">
+            
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>Id</th>
+                    <th>Date</th>
+                    <th>Customer</th>
+                    <th>Taxable Value</th>
+                    <th>Tax</th>
+                    <th>Value</th>
+                    <th>Modify</th> 
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-inv let-i="rowIndex">
+                <tr>
+                    
+                    <td>{{inv.id}}</td>
+                    <td>{{inv.date}}</td>
+                    <td>{{inv.vendor}}</td>
+                    
+                    <td style="text-align: right;">{{inv.taxablevalue | number:'1.2-2'}}</td>
+                    <td style="text-align: right;">{{inv.tax | number:'1.2-2'}}</td>
+                    <td style="text-align: right;">{{inv.aftertaxvalue | number:'1.2-2'}}</td>
+                    <td>
+                        <div>
+                            <button pButton class="p-button-sm" (click)="handleView(inv.invoice)">VIEW</button>
+                            <button pButton class="p-button-sm" (click)="handleNewPrint(inv.invoice)">PRINT</button>
+                            <button pButton class="p-button-sm" (click)="handleSendInvoice(inv.invoice)">SEND INVOICE</button>
+                            <button pButton class="p-button-sm" (click)="handleReturn(inv.invoice)">SALE RETURN</button>
+                            <button pButton class="p-button-sm" (click)="handleEWayBillNo(inv.invoice)">OPTIONS</button>
+                        </div>
+                    </td>
+    
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+      <button pButton label="Save"></button>
+      <button pButton label="Cancel"></button>
+    </ng-template>
+  </p-card> -->
+
+
+
+
+  <div class="card">
+    <div class="card-container purple-container">
+        <div class="inline-block w-4rem h-4rem bg-purple-500 text-white font-bold text-center p-4 border-round">1</div>
+        <div class="inline-block w-4rem h-4rem bg-purple-500 text-white font-bold text-center p-4 border-round mx-4">2</div>
+        <div class="inline-block w-4rem h-4rem bg-purple-500 text-white font-bold text-center p-4 border-round">3</div>
+    </div>
+</div>
+

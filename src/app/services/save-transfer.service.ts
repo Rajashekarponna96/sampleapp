@@ -1,0 +1,30 @@
+import { GlobalConstants } from '../global/global-constants';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SaveTransferService {
+
+  constructor(private http:HttpClient) { }
+
+  saveTransfer(transfer:any) {
+    let loginObject = GlobalConstants.loginObject
+    
+    let headers  = new HttpHeaders();
+    headers = headers.append('Content-Type','application/json; charset=utf-8').append('authorization','Basic ' + btoa(loginObject.accountid+":"+loginObject.endpoint+":"+loginObject.token+":"+loginObject.schema+":"+loginObject.database));
+    
+    transfer["schema"] = loginObject.schema 
+
+    let postdata = JSON.stringify(transfer)
+
+    let params = new HttpParams();
+    params = params.append('postdata',postdata);
+   
+    let ROOT_URL = 'https://'+loginObject.appurl+'/unifund/AuthTransfer';
+
+    return this.http.put(ROOT_URL,postdata,{headers:headers})
+  }
+}

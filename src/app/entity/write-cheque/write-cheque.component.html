@@ -1,0 +1,247 @@
+<style>
+    .container{
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto;
+      grid-template-columns: auto;
+      
+    }
+    
+    .namebox {
+        /* background-color: chartreuse; */
+        
+        width: 100%;
+        padding: 1em;
+        padding-left: 1em;
+        padding-top: 1em;
+        padding-right: calc(20%);
+
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .modifytax {
+        display: grid;
+        grid-template-areas: 'edit delete';
+        gap: 5px;
+    }
+
+    .displayline {
+        display: grid;
+        grid-template-areas: 'qty uom am';
+        gap: 5px;
+    }
+
+    .pcradiogroup{
+        display: grid;
+        grid-template-areas: 'rit ret';
+        gap: 5px;
+        
+    }
+
+    .displayfour {
+        display: grid;
+        grid-template-areas: 'a b c';
+        gap: 5px;
+    }
+
+    
+    .stocktableprogress {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        left: 0;
+        background-color: rgba(255, 1, 1, 0);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+
+    .overlay {
+
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        left: 0;
+        background-color: rgba(255, 1, 1, 0);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+    }
+
+</style>
+
+
+<div class="container">
+
+    <div>Cheques Written</div>
+
+    
+    <div>
+        <ng-template [ngIf]="lo.digitalkey.writecheque.new"><p-button (click)="showModalDialog()" icon="pi pi-external-link" label="Write Cheque"></p-button></ng-template>
+        <p-button (click)="handleMore()" icon="pi pi-external-link" label="Next"></p-button>
+    </div>
+
+    <p-table [value]="chequeList" [scrollable]="true"  
+    selectionMode="single" scrollHeight="500px" 
+        (onRowSelect)="onRowSelect($event)" dataKey="recordid" selectionMode="single" styleClass="p-datatable-gridlines">
+        
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Date</th>
+                <th>Party</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Modify</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-ch let-i="rowIndex">
+            <tr>
+                
+                <td>{{ch.maturitydate}}</td>
+                <td>{{ch.originalparty.accounthead}}</td>
+                <td>{{ch.amount | number:'1.2-2'}}</td>
+                <td>{{ch.status}}</td>
+                <td>
+                    <div>
+                        <button pButton class="p-button-sm" (click)="handleView(ch)">VIEW</button>
+                    </div>
+                </td>
+
+            </tr>
+        </ng-template>
+    </p-table> 
+
+    <p-dialog header="Write Cheque" [(visible)]="displayModal" [modal]="true" [style]="{width: '100%'}"
+    [draggable]="false" [resizable]="false">
+
+        <form #f="ngForm" autocomplete="off" novalidate class="box">
+
+            <div>
+                <div>Date</div>
+                <p-calendar 
+                [(ngModel)]="selectedDate"
+                [ngModelOptions]="{standalone: true}" 
+                [showTime]="true" [showSeconds]="true" 
+                inputId="time" 
+                appendTo="body" (onSelect)="dateSelected($event)" 
+                [required]="true">
+                </p-calendar>
+                
+            </div>
+
+            <div>
+                <div>cheque number</div>
+                <input type="text" #selectNumber="ngModel" pInputText class="p-inputtext-sm" 
+            placeholder="cheque number" [(ngModel)]="selectedNumber" 
+            [ngModelOptions]="{standalone: true}"  autocomplete="off" 
+            required>
+            <ng-template [ngIf]="selectNumber.errors">
+                <small id="username2-help" class="p-error block">you must enter cheque number</small>
+            </ng-template>
+
+            </div>
+
+            <div>
+                <div>Party</div>
+                <p-autoComplete
+                    [(ngModel)]="selectedParty"
+                    [suggestions]="filteredParties" 
+                    (completeMethod)="filterParties($event)"
+                    field="accounthead" 
+                    [multiple]="false" class="autocomplete" 
+                    (onSelect)="handleOnSelectParty($event)"
+                    [style]="{'width':'100%'}"
+                    [inputStyle]="{'width':'100%'}" 
+                    [placeholder]="placeholderParty" 
+                    [ngModelOptions]="{standalone: true}"
+                    (ngModelChange)="partyChange($event)"
+                    [required]="true" #selectParty="ngModel" 
+                    [forceSelection]="true">
+
+                    <ng-template let-selectedParty pTemplate="item">
+                        <div>{{selectedParty.accounthead}} - {{selectedParty.id}}</div>
+                        <div>{{selectedParty.endpoint}}</div>
+                    </ng-template>
+
+                </p-autoComplete>
+                <ng-template [ngIf]="selectParty.errors">
+                    <small id="username2-help" class="p-error block">you must select a party</small>
+                </ng-template>
+
+            </div>
+            
+            <div>
+                <div>Bank</div>
+                <p-autoComplete
+                    [(ngModel)]="selectedBankParty"
+                    [suggestions]="filteredBankParties" 
+                    (completeMethod)="filterBankParties($event)"
+                    field="accounthead" 
+                    [multiple]="false" class="autocomplete" 
+                    (onSelect)="handleOnSelectBankParty($event)"
+                    [style]="{'width':'100%'}"
+                    [inputStyle]="{'width':'100%'}" 
+                    [placeholder]="placeholderBankParty" 
+                    [ngModelOptions]="{standalone: true}"
+                    (ngModelChange)="bankPartyChange($event)"
+                    [required]="true" #selectBankParty="ngModel" 
+                    [forceSelection]="true">
+
+                    <ng-template let-selectedBankParty pTemplate="item">
+                        <div>{{selectedBankParty.accounthead}} - {{selectedBankParty.id}}</div>
+                        <div>{{selectedBankParty.endpoint}}</div>
+                    </ng-template>
+
+                </p-autoComplete>
+                <ng-template [ngIf]="selectBankParty.errors">
+                    <small id="username2-help" class="p-error block">you must select a bank</small>
+                </ng-template>
+
+            </div>
+
+            <div>
+                <div>amount</div>
+                <input type="number" min="0" #selectVal="ngModel" pInputText class="p-inputtext-sm" 
+            placeholder="enter amount" [(ngModel)]="selectedVal" 
+            [ngModelOptions]="{standalone: true}"  autocomplete="off" 
+            required>
+            <ng-template [ngIf]="selectVal.errors">
+                <small id="username2-help" class="p-error block">you must enter an amount</small>
+            </ng-template>
+
+            </div>
+
+
+        </form>
+
+        <ng-template pTemplate="footer">
+            <p-button icon="pi pi-check" (click)="handleSaveCheque()" label="Save" styleClass="p-button-text"></p-button>
+        </ng-template>
+
+
+    </p-dialog>
+
+    <p-dialog header="View Payment" [(visible)]="displayViewModal" [modal]="true" [style]="{width: '100%'}">
+        <div>
+            <pre>{{selectedCheque | json }}</pre>
+        </div>
+    </p-dialog>
+
+    <p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+
+
+    <ng-template [ngIf]="inProgress">
+        <div class="overlay" id="modal">
+            <p-progressSpinner></p-progressSpinner>
+        </div>
+    </ng-template> 
+
+</div>

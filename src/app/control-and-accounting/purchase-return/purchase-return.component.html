@@ -1,0 +1,204 @@
+<style>
+    .container{
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto;
+      grid-template-columns: auto;
+      
+    }
+    
+    .namebox {
+        /* background-color: chartreuse; */
+        
+        width: 100%;
+        padding: 1em;
+        padding-left: 1em;
+        padding-top: 1em;
+        padding-right: calc(20%);
+
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .modifytax {
+        display: grid;
+        grid-template-areas: 'edit delete';
+        gap: 5px;
+    }
+
+    .displayline {
+        display: grid;
+        grid-template-areas: 'qty uom am';
+        gap: 5px;
+    }
+
+    .pcradiogroup{
+        display: grid;
+        grid-template-areas: 'rit ret';
+        gap: 5px;
+        
+    }
+
+    
+.stocktableprogress {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        left: 0;
+        background-color: rgba(255, 1, 1, 0);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+}
+
+
+    .overlay {
+
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        left: 0;
+        background-color: rgba(255, 1, 1, 0);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+    }
+
+
+    
+
+</style>
+
+<div class="container">  
+    
+    
+
+    <!-- <p-button (click)="showModalDialog()" icon="pi pi-external-link" label="New"></p-button> -->
+    <div>Register of Purchase Returns</div>
+
+    <p-table [value]="sanitizedInvoiceList" [scrollable]="true"  
+    selectionMode="single" scrollHeight="500px" 
+        (onRowSelect)="onRowSelect($event)" dataKey="recordid" selectionMode="single" styleClass="p-datatable-gridlines">
+        
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Date</th>
+                <th>Customer</th>
+                <th>Taxable Value</th>
+                <th>Tax</th>
+                <th>Value</th>
+                <th>Modify</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-inv let-i="rowIndex">
+            <tr>
+                
+                <td>{{inv.date}}</td>
+                <td>{{inv.vendor}}</td>
+                <td>{{inv.taxablevalue | number: '1.2-2'}}</td>
+                <td>{{inv.tax | number: '1.2-2'}}</td>
+                <td>{{inv.aftertaxvalue | number: '1.2-2'}}</td>
+                <td>
+                    <div>
+                        <button pButton class="p-button-sm" (click)="handleView(inv.invoice)">VIEW</button>
+                    </div>
+                </td>
+
+            </tr>
+        </ng-template>
+    </p-table>
+
+    
+
+    
+
+
+    <p-dialog header="View Purchase Return Invoice" [(visible)]="displayViewModal" [modal]="true" [style]="{width: '100%'}">
+        <div>
+            <!-- <pre>{{selectedInvoice.partyaccounthead | json }}</pre> -->
+        </div>
+    
+        <div>Date: {{selectedInvoice.date}} </div>
+        <div>Vendor: {{ viewPartyName }}</div>
+     
+        <div class="card">
+            <p-table [value]="selectedInvoice.vouchers" [scrollable]="true"  
+            selectionMode="single" scrollHeight="200px" dataKey="recordid" selectionMode="single" styleClass="p-datatable-sm">
+                
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>Item</th>
+                        <th>Qty</th>
+                        <th>uom</th>
+                        <th>Rate</th>
+                        <th>Amount</th>
+                        <!-- <th>Modify</th> -->
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-v let-i="rowIndex">
+                    <tr>
+                        <td>{{v.object.itemname}}</td>
+                        <td>{{v.quantity}}</td>
+                        <td>{{v.object.uom.uom}}</td>
+                        <td>{{v.rateaftertaxes | number: '1.2-2'}}</td>
+                        <td>{{v.quantity * v.rateaftertaxes | number: '1.2-2'}}</td>
+                        <!-- <td>
+                            <div class="displayline">
+                                <button pButton class="p-button-sm" (click)="handleEditVoucher(v)">EDIT</button>
+                                <button pButton class="p-button-sm" (click)="handleDeleteVoucher(i)">DEL</button>
+                            </div>
+                            
+                        </td> -->
+                        
+                    </tr>
+                </ng-template> 
+                <ng-template pTemplate="footer">
+                    <tr>
+                        <td colspan="4" class="text-right">Total</td>
+                        <td >{{viewTotal | number: '1.2-2'}}</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    
+        <!-- <p-table [value]="viewList">
+            
+            <ng-template pTemplate="body" let-car let-i="rowIndex">
+                <tr *ngIf="i === 0">
+                    <td colspan="5"><h1>{{car.col1}}</h1></td>
+                </tr>
+                <tr *ngIf="i === 1">
+                    <td colspan="5">{{car.col1}}</td>
+                </tr>
+                <tr *ngIf="i === 2">
+                    <td rowspan="2">{{car.col1}}</td>
+                    <td rowspan="2">{{car.col2}}</td>
+                    <td rowspan="2">{{car.col3}}</td>
+                    <td>{{car.col4}}</td>
+                    <td>{{car.col5}}</td>
+                </tr>
+                <tr *ngIf="i === 3">
+                    <td colspan="3" class="text-right"></td>
+                    <td>{{car.col1}}</td>
+                    <td>{{car.col2}}</td>
+                </tr>
+            </ng-template>
+        </p-table> -->
+    </p-dialog>
+
+    <p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+
+
+    <ng-template [ngIf]="inProgress">
+        <div class="overlay" id="modal">
+            <p-progressSpinner></p-progressSpinner>
+        </div>
+    </ng-template>
+
+</div> 

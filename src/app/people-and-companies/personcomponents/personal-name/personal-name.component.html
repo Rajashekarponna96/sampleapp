@@ -1,0 +1,54 @@
+
+<style>
+    
+    .box {
+        
+        padding: 1em;
+        padding-left: 1em;
+        padding-top: 1em;
+        padding-right: calc(20%);
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        gap: 5px;
+        
+    }
+
+    .namebox {
+        /* background-color: chartreuse; */
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+    .buttonbox {
+        /* background-color: gold; */
+        display: flex;
+        align-items: center;
+        
+    }
+
+    
+
+
+</style>
+
+
+
+<div class="box">
+    <div class="namebox">
+        <input type="text" pInputText class="p-inputtext-sm fn" placeholder="first name" [(ngModel)]="personalName.firstname" (ngModelChange)="handleChange($event)" autocomplete="off" [disabled]="whetherDisabled">
+        <input type="text" pInputText class="p-inputtext-sm" placeholder="middle name" [(ngModel)]="personalName.middlename" (ngModelChange)="handleChange($event)" autocomplete="off" [disabled]="whetherDisabled">
+        <input type="text" pInputText class="p-inputtext-sm" placeholder="last name" [(ngModel)]="personalName.lastname" (ngModelChange)="handleChange($event)" autocomplete="off" [disabled]="whetherDisabled">
+        <span class="p-fluid">
+            <p-autoComplete [(ngModel)]="selectedTags" [ngModelOptions]="{standalone: true}" 
+            [suggestions]="filteredTags" (completeMethod)="filterTags($event)" field="tag" [multiple]="true" [dropdown]="true" (ngModelChange)="handleChange($event)">
+            </p-autoComplete>
+        </span>
+    </div>
+    <div class="buttonbox">
+        <button id="lbtn" (click)="handleDelete()" pButton class="p-button-sm menu-button" [disabled]="whetherDisabled">Delete</button>
+    </div>
+</div>
+
+

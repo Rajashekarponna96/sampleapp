@@ -1,0 +1,55 @@
+<style>
+    
+    .box {
+        
+        padding: 1em;
+        padding-left: 1em;
+        padding-top: 1em;
+        padding-right: calc(20%);
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        gap: 5px;
+        
+    }
+
+    .namebox {
+        /* background-color: chartreuse; */
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+    .buttonbox {
+        /* background-color: gold; */
+        display: flex;
+        align-items: center;
+        
+    }
+
+    
+
+
+</style>
+
+
+
+<div class="box">
+    <div class="namebox">
+        <input type="text" pInputText class="p-inputtext-sm fn" placeholder="Door No" [(ngModel)]="endpoint.detail.doorno" (ngModelChange)="handleChange($event,'doorno')" autocomplete="off" [disabled]="whetherDisabled">
+        <input type="text" pInputText class="p-inputtext-sm" placeholder="Street" [(ngModel)]="endpoint.detail.street" (ngModelChange)="handleChange($event,'street')" autocomplete="off" [disabled]="whetherDisabled">
+        <input type="text" pInputText class="p-inputtext-sm" placeholder="Area" [(ngModel)]="endpoint.detail.area" (ngModelChange)="handleChange($event,'area')" autocomplete="off" [disabled]="whetherDisabled">
+        <input type="text" pInputText class="p-inputtext-sm" placeholder="City" [(ngModel)]="endpoint.detail.city" (ngModelChange)="handleChange($event,'city')" autocomplete="off" [disabled]="whetherDisabled">
+        <input type="text" pInputText class="p-inputtext-sm" placeholder="State" [(ngModel)]="endpoint.detail.state" (ngModelChange)="handleChange($event,'state')" autocomplete="off" [disabled]="whetherDisabled">
+        <input type="text" pInputText class="p-inputtext-sm" placeholder="Country" [(ngModel)]="endpoint.detail.country" (ngModelChange)="handleChange($event,'country')" autocomplete="off"[disabled]="whetherDisabled">
+        <input type="text" pInputText class="p-inputtext-sm" placeholder="Postal Code" [(ngModel)]="endpoint.detail.pincode" (ngModelChange)="handleChange($event,'pincode')" autocomplete="off" [disabled]="whetherDisabled">
+        <span class="p-fluid">
+            <p-autoComplete [(ngModel)]="selectedTags" [ngModelOptions]="{standalone: true}" 
+            [suggestions]="filteredTags" (completeMethod)="filterTags($event)" field="tag" [multiple]="true" [dropdown]="true" (ngModelChange)="handleChange($event,'tags')">
+            </p-autoComplete>
+        </span>
+    </div>
+    <div class="buttonbox">
+        <button id="lbtn" (click)="handleDelete()" pButton class="p-button-sm menu-button" [disabled]="whetherDisabled">Delete</button>
+    </div>
+</div>

@@ -1,0 +1,186 @@
+<style>
+    .container{
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto;
+      grid-template-columns: auto;
+      
+      
+    }
+    
+    .namebox {
+        /* background-color: chartreuse; */
+        
+        width: 100%;
+        height: 100%;
+        padding: 1em;
+        padding-left: 1em;
+        padding-top: 1em;
+        padding-right: calc(20%);
+        overflow-y: auto;
+
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .modifytax {
+        display: grid;
+        grid-template-areas: 'edit delete';
+        gap: 5px;
+    }
+
+    .displayline {
+        display: grid;
+        grid-template-areas: 'qty uom am';
+        gap: 5px;
+    }
+
+    /* .pcradiogroup{
+        display: grid;
+        grid-template-areas: 'rit ret';
+        gap: 5px;
+        
+    } */
+
+    .overlay {
+
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        left: 0;
+        background-color: rgba(255, 1, 1, 0);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+    }
+
+    .pcradiogroup{
+        
+        font-family: -apple-system, BlinkMacSystemFont, “Segoe UI”, Roboto, Helvetica,
+        Arial, sans-serif, “Apple Color Emoji”, “Segoe UI Emoji”, “Segoe UI Symbol”;
+        /* font-size: 14px; */
+
+        padding-left: 1em;
+        padding-top: 1em;
+        
+    }
+
+
+    #companyradio {
+        margin-left: 50px;
+    }
+    
+    .buttonbox {
+        padding-left: 1em;
+    }
+
+</style>
+
+
+
+
+<div class="container"> 
+    
+    <div class="namebox">
+        <div class="pcradiogroup">
+            <p-radioButton name="pc" value="person" label="Person" [(ngModel)]="person.pc" inputId="pc1"  [disabled]="true" ></p-radioButton>
+            <p-radioButton id="companyradio" name="pc" value="company" label="Company" [(ngModel)]="person.pc" inputId="pc2"  [disabled]="true"></p-radioButton>
+        </div>
+        <br>
+        
+        <div>
+            <ng-container *ngFor="let name of person.names; let i = index">
+                <div *ngIf="isperson; then thenBlock else elseBlock"></div>
+                <ng-template #thenBlock>
+                    <app-personal-name [personalName]="name" [mode]="''" (deleteEvent)="handleDeleteOfName($event,i)" ></app-personal-name>
+                </ng-template>
+                <ng-template #elseBlock> 
+                    <app-company-name [companyName]="name" [mode]="''" (deleteEvent)="handleDeleteOfName($event,i)"  ></app-company-name>
+                    <!-- <div>{{name.name}}</div>   -->
+                </ng-template>
+            </ng-container> 
+        </div>
+        <div class="buttonbox">
+            <button id="lbtnn" (click)="handleAddName()" pButton class="p-button-sm menu-button">Add Name</button>
+        </div>
+    
+        <br>
+        <br>
+        <br>
+        <div>
+            <ng-container *ngFor="let telephone of telephones; let i = index">
+                <!-- <div>{{ telephone.detail.telephone }}</div> -->
+                <app-telephone [endpoint]="telephone" [mode]="''" (deleteEvent)="handleDeleteOfTelephone($event,i)"></app-telephone>
+            </ng-container>
+        </div>
+        <div class="buttonbox">
+            <button id="lbtnt" (click)="handleAddTelephone()" pButton class="p-button-sm menu-button">Add Telephone</button>
+        </div>
+        <br>
+        <br>
+        <br>
+        <div>
+            <ng-container *ngFor="let emailid of emailids; let i = index">
+                <!-- <div>{{ emailid.detail.emailid }}</div> -->
+                <app-email-id [endpoint]="emailid" [mode]="''" (deleteEvent)="handleDeleteOfEmail($event,i)"></app-email-id>    
+            </ng-container>
+        </div>
+        <div class="buttonbox">
+            <button id="lbtne" (click)="handleAddEmailID()" pButton class="p-button-sm menu-button">Add EmailID</button>
+        </div>
+        <br>
+        <br>
+        <br>
+    
+        <div>
+            <ng-container *ngFor="let address of postalAddresses; let i = index">
+                <!-- <div>{{ emailid.detail.emailid }}</div> -->
+                <app-postal-address [endpoint]="address" [mode]="''" (deleteEvent)="handleDeleteOfPostalAddress($event,i)"></app-postal-address>
+            </ng-container>
+        </div>
+        <div class="buttonbox">
+            <button id="lbtna" (click)="handleAddAddress()" pButton class="p-button-sm menu-button">Add Address</button>
+        </div>
+        <br>
+        <br>
+        <br>
+        <div>
+            <ng-container *ngFor="let govtid of person.govtids; let i = index">
+                <app-govt-id [govtid]="govtid" (deleteEvent)="handleDeleteOfGovtID($event,i)"></app-govt-id>
+            </ng-container>
+        </div>
+        <div class="buttonbox">
+            <button id="lbtn" (click)="handleAddGovtID()" pButton class="p-button-sm menu-button">Add GovtID</button>
+        </div>
+    
+    
+        
+    
+        <div>
+            <!-- <pre>{{person | json }}</pre> -->
+        </div>
+    
+    
+        
+        <p-button icon="pi pi-check" (click)="atleast()" label="Update" styleClass="p-button-text"></p-button>
+        
+    
+    
+        <ng-template [ngIf]="inProgress">
+            <div class="overlay" id="modal">
+                <p-progressSpinner></p-progressSpinner>
+            </div>
+        </ng-template>
+
+        <p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+
+    
+    </div>
+
+
+</div>

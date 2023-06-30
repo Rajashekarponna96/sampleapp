@@ -1,0 +1,88 @@
+<style>
+    
+     .pcradiogroup{
+        
+        font-family: -apple-system, BlinkMacSystemFont, “Segoe UI”, Roboto, Helvetica,
+        Arial, sans-serif, “Apple Color Emoji”, “Segoe UI Emoji”, “Segoe UI Symbol”;
+        /* font-size: 14px; */
+
+        padding-left: 1em;
+        padding-top: 1em;
+        
+    }
+
+
+    #companyradio {
+        margin-left: 50px;
+    }
+    
+    .buttonbox {
+        padding-left: 1em;
+    }
+
+</style>
+
+
+
+<!-- <pre>{{ personWithoutEndpoint | json}}</pre> -->
+
+<div class="pcradiogroup">
+	<p-radioButton name="pc" value="person" label="Person" [(ngModel)]="personWithoutEndpoint.pc" inputId="pc1" (ngModelChange)="pcchange($event)" [disabled]="disableRadio"></p-radioButton>
+    <p-radioButton id="companyradio" name="pc" value="company" label="Company" [(ngModel)]="personWithoutEndpoint.pc" inputId="pc2" (ngModelChange)="pcchange($event)" [disabled]="disableRadio"></p-radioButton>
+</div>
+<!--personal names-->
+<div>
+    
+
+    <ng-container *ngFor="let name of personWithoutEndpoint.content.names">
+        <div *ngIf="isperson; then thenBlock else elseBlock"></div>
+        <ng-template #thenBlock>
+            <app-personal-name [personalName]="name" (deleteEvent)="handleDeleteOfName($event)"></app-personal-name>
+            <!-- <app-company-name [companyName]="name" (deleteEvent)="handleDeleteOfName($event)"  [currentMode]="currentMode" ></app-company-name> -->
+        </ng-template>
+        <ng-template #elseBlock>
+            <app-company-name [companyName]="name" (deleteEvent)="handleDeleteOfName($event)"></app-company-name>
+        </ng-template>
+    </ng-container>
+
+    
+</div>
+
+
+<div class="buttonbox">
+    <button id="lbtn" (click)="handleAddName()" pButton class="p-button-sm menu-button">Add Name</button>
+</div>
+
+
+
+<!--email ids-->
+<div>
+    <ng-container *ngFor="let emailid of emailids">
+        <app-email-id [endpoint]="emailid" (deleteEvent)="handleDeleteOfEmail($event)"></app-email-id>    
+    </ng-container>
+</div>
+
+<div class="buttonbox">
+    <button id="lbtn" (click)="handleAddEmailID()" pButton class="p-button-sm menu-button">Add EmailID</button>
+</div>
+
+
+<!--telephones-->
+<div>
+    <ng-container *ngFor="let telephone of telephones">
+        <app-telephone [endpoint]="telephone" (deleteEvent)="handleDeleteOfTelephone($event)" ></app-telephone>    
+    </ng-container>
+</div>
+<div class="buttonbox">
+    <button id="lbtn" (click)="handleAddTelephone()" pButton class="p-button-sm menu-button" [disabled]="disablePNButton">Add Telephone</button>
+</div>
+
+<!--postal addresses-->
+<div>
+    <ng-container *ngFor="let postalAddress of postalAddresses">
+        <app-postal-address [endpoint]="postalAddress" (deleteEvent)="handleDeleteOfPostalAddress($event)"></app-postal-address>
+    </ng-container>
+</div>
+<div class="buttonbox">
+    <button id="lbtn" (click)="handleAddAddress()" pButton class="p-button-sm menu-button" [disabled]="disablePNButton">Add Telephone</button>
+</div>

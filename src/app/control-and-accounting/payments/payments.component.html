@@ -1,0 +1,551 @@
+<style>
+    .container{
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto;
+      grid-template-columns: auto;
+      
+    }
+    
+    .namebox {
+        /* background-color: chartreuse; */
+        
+        width: 100%;
+        padding: 1em;
+        padding-left: 1em;
+        padding-top: 1em;
+        padding-right: calc(20%);
+
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .modifytax {
+        display: grid;
+        grid-template-areas: 'edit delete';
+        gap: 5px;
+    }
+
+    .displayline {
+        display: grid;
+        grid-template-areas: 'qty uom am';
+        gap: 5px;
+    }
+
+    .pcradiogroup{
+        display: grid;
+        grid-template-areas: 'rit ret';
+        gap: 5px;
+        
+    }
+
+    .displayfour {
+        display: grid;
+        grid-template-areas: 'a b c';
+        gap: 5px;
+    }
+
+    
+.stocktableprogress {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        left: 0;
+        background-color: rgba(255, 1, 1, 0);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+}
+
+
+    .overlay {
+
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        left: 0;
+        background-color: rgba(255, 1, 1, 0);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+    }
+
+</style>
+
+<div class="container">
+
+   
+    <div>Register of Payments</div>
+
+    <ng-template [ngIf]="lo.digitalkey.payments.new"><p-button (click)="showModalDialog()" icon="pi pi-external-link" label="New Payment"></p-button></ng-template>
+    <p-button (click)="showModalPaymentsDialog()" icon="pi pi-external-link" label="Payments Register"></p-button>
+
+    <p-dialog header="Register of Payments" [(visible)]="displayViewPaymentsModal" [modal]="true" [style]="{width: '100%'}">
+        
+        <p-table [value]="sanitizedInvoiceList" [scrollable]="true"  
+    selectionMode="single" scrollHeight="500px" 
+        (onRowSelect)="onRowSelect($event)" dataKey="recordid" selectionMode="single" styleClass="p-datatable-gridlines">
+        
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Date</th>
+                <th>Party</th>
+                <th>Amount</th>
+                <th>Modify</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-inv let-i="rowIndex">
+            <tr>
+                
+                <td>{{inv.date}}</td>
+                <td>{{inv.vendor}}</td>
+                <td>{{inv.amount | number: '1.2-2'}}</td>
+                <td>
+                    <div>
+                        <button pButton class="p-button-sm" (click)="handleView(inv.invoice)">VIEW</button>
+                    </div>
+                </td>
+
+            </tr>
+        </ng-template>
+    </p-table>
+    </p-dialog>
+
+    
+
+
+
+
+    <p-table [value]="sanitizedPabList" [scrollable]="true"  
+    selectionMode="single" scrollHeight="500px" 
+        (onRowSelect)="onRowSelect($event)" dataKey="recordid" selectionMode="single" styleClass="p-datatable-gridlines">
+        
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Id</th>
+                <th>Party</th>
+                <th>Receivable</th>
+                <th>Payable</th>
+                <!-- <th>Modify</th> -->
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-inv let-i="rowIndex">
+            <tr>
+                
+                <td>{{inv.account.id}}</td>
+                <td>{{inv.account.accounthead}}</td>
+                <td>{{inv.debit | number: '1.2-2'}}</td>
+                <td>{{inv.credit | number: '1.2-2'}}</td>
+                <!-- <td>
+                    <div>
+                        <button pButton class="p-button-sm" (click)="handleView(inv.invoice)">VIEW</button>
+                    </div>
+                </td> -->
+
+            </tr>
+        </ng-template>
+    </p-table>
+
+
+
+
+    <p-dialog header="Payment" [(visible)]="displayModal" [modal]="true" [style]="{width: '100%'}"
+    [draggable]="false" [resizable]="false">
+    
+    
+        <form #f="ngForm" autocomplete="off" novalidate class="box">
+
+            <div>
+                <div>Date</div>
+                <p-calendar 
+                [(ngModel)]="selectedDate"
+                [ngModelOptions]="{standalone: true}" 
+                [showTime]="true" [showSeconds]="true" 
+                inputId="time" 
+                appendTo="body" (onSelect)="dateSelected($event)" 
+                [required]="true">
+                </p-calendar>
+                
+            </div>
+            
+            <!-- <div>
+                <div>Entity</div>
+                <p-autoComplete
+                    [(ngModel)]="selectedEntity"
+                    [suggestions]="filteredEntities" 
+                    (completeMethod)="filterEntities($event)"
+                    field="name" 
+                    [multiple]="false" class="autocomplete" 
+                    (onSelect)="handleOnSelect($event)"
+                    [style]="{'width':'100%'}"
+                    [inputStyle]="{'width':'100%'}" 
+                    [placeholder]="placeholderEntity" 
+                    [ngModelOptions]="{standalone: true}"
+                    (ngModelChange)="entityChange($event)"
+                    [required]="true" #selectEntity="ngModel" 
+                    [forceSelection]="true">
+                </p-autoComplete>
+                <ng-template [ngIf]="selectEntity.errors">
+                    <small id="username2-help" class="p-error block">you must select an entity name</small>
+                </ng-template>
+
+            </div> -->
+
+            <div>
+                <div>Party</div> 
+                <p-autoComplete
+                    [(ngModel)]="selectedParty"
+                    [suggestions]="filteredParties" 
+                    (completeMethod)="filterParties($event)"
+                    field="accounthead" 
+                    [multiple]="false" class="autocomplete" 
+                    (onSelect)="handleOnSelectParty($event)"
+                    [style]="{'width':'100%'}"
+                    [inputStyle]="{'width':'100%'}" 
+                    [placeholder]="placeholderParty" 
+                    [ngModelOptions]="{standalone: true}"
+                    (ngModelChange)="partyChange($event)"
+                    [required]="true" #selectParty="ngModel" 
+                    [forceSelection]="true">
+
+                    <ng-template let-selectedParty pTemplate="item">
+                        <div>{{selectedParty.accounthead}} - {{selectedParty.id}}</div>
+                        <div>{{selectedParty.endpoint}}</div>
+                    </ng-template>
+
+                </p-autoComplete>
+                <ng-template [ngIf]="selectParty.errors">
+                    <small id="username2-help" class="p-error block">you must select a party</small>
+                </ng-template>
+
+            </div>
+
+
+            <div class="displayfour">
+                
+                <p-button (click)="showChequeDialog()" icon="pi pi-external-link" label="Cheques"></p-button>
+                <p-button (click)="showViaPersonDialog()" icon="pi pi-external-link" label="via Person"></p-button>
+                <p-button icon="pi pi-external-link" label="Other"></p-button>
+            </div>
+
+            
+
+            <div class="card">
+                <p-table [value]="selectedVouchers" [scrollable]="true"  
+                selectionMode="single" scrollHeight="200px" 
+                (onRowSelect)="onRowSelect($event)" dataKey="recordid" selectionMode="single" styleClass="p-datatable-sm">
+                    
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>Instrument</th>
+                            <th>Number</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                            <th>Modify</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-v let-i="rowIndex">
+                        <tr>
+                            <td>{{v.object.instrumenttype}}</td>
+                            <td>{{v.object.instrumentnumber}}</td>
+                            <td>{{v.object.amount}}</td>
+                            <!-- <td>
+                                <div *ngIf="v.isviaperson; then thenBlock else elseBlock"></div>
+                                <ng-template #thenBlock>{{v.objecttype}}</ng-template>
+                                <ng-template #elseBlock>{{v.object.instrumenttype}}</ng-template>
+                            </td> -->
+                            <!-- <td>
+                                <div *ngIf="v.isviaperson; then thenBlock else elseBlock"></div>
+                                <ng-template #thenBlock>{{v.object.accounthead}}</ng-template>
+                                <ng-template #elseBlock>{{v.object.instrumentnumber}}</ng-template>
+                            </td> -->
+                            <!-- <td>
+                                <div *ngIf="v.isviaperson; then thenBlock else elseBlock"></div>
+                                <ng-template #thenBlock>{{v.userinputrate}}</ng-template>
+                                <ng-template #elseBlock>{{v.object.amount}}</ng-template>
+                            </td> -->
+                            <td>
+                                <div class="displayline">
+                                    <button pButton class="p-button-sm" (click)="handleEditVoucher(v)">EDIT</button>
+                                    <button pButton class="p-button-sm" (click)="handleDeleteVoucher(i)">DEL</button>
+                                </div>
+                                
+                            </td>
+                            
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+
+
+
+            <p-dialog header="Cash Voucher" [(visible)]="displayCashModal" [modal]="true"
+                [draggable]="false" [resizable]="false">
+            
+                <div>
+                    <div>Cash</div>
+                    
+                    <div>
+                        <input type="number" min="0"  #selectCashAmount="ngModel" pInputText class="p-inputtext-sm" 
+                    placeholder="enter cash" [(ngModel)]="selectedCashAmount" 
+                    [ngModelOptions]="{standalone: true}"  autocomplete="off" (ngModelChange)="cashAmountChange($event)"
+                    required>
+                    </div>
+                
+                </div>
+
+                
+
+            </p-dialog>
+
+
+
+            <p-dialog header="Via Person Voucher" [(visible)]="displayViaPersonModal" [modal]="true"
+                [draggable]="false" [resizable]="false">
+            
+                <div>
+                    <div>Via Person</div> 
+                    <p-autoComplete
+                        [(ngModel)]="selectedViaPerson"
+                        [suggestions]="filteredViaPeople" 
+                        (completeMethod)="filterViaPeople($event)"
+                        field="accounthead" 
+                        [multiple]="false" class="autocomplete" 
+                        (onSelect)="handleOnSelectViaPerson($event)"
+                        [style]="{'width':'100%'}"
+                        [inputStyle]="{'width':'100%'}" 
+                        [placeholder]="placeholderViaPerson" 
+                        [ngModelOptions]="{standalone: true}"
+                        (ngModelChange)="viaPersonChange($event)"
+                        [required]="true" #selectViaPerson="ngModel" 
+                        [forceSelection]="true">
+    
+                        <ng-template let-selectedViaPerson pTemplate="item">
+                            <div>{{selectedViaPerson.accounthead}} - {{selectedViaPerson.id}}</div>
+                            <div>{{selectedViaPerson.endpoint}}</div>
+                        </ng-template>
+    
+                    </p-autoComplete>
+                    <ng-template [ngIf]="selectViaPerson.errors">
+                        <small id="username2-help" class="p-error block">you must select a party</small>
+                    </ng-template>
+
+                    <div>
+                        <div>Amount</div>
+                        
+                        <div>
+                            <input type="number" min="0"  #selectViaPersonAmount="ngModel" pInputText class="p-inputtext-sm" 
+                        placeholder="enter amount" [(ngModel)]="selectedViaPersonAmount" 
+                        [ngModelOptions]="{standalone: true}"  autocomplete="off" (ngModelChange)="viaPersonAmountChange($event)"
+                        required>
+                        </div>
+                    
+                    </div>
+    
+                </div>
+                <ng-template pTemplate="footer">
+                    <p-button icon="pi pi-check" (click)="handleAddViaPerson()" label="Ok" styleClass="p-button-text"></p-button>
+                </ng-template>
+            </p-dialog>
+            
+
+            <p-dialog header="Cheque Voucher" [(visible)]="displayChequeModal" [modal]="true"
+                [draggable]="false" [resizable]="false" [style]="{width: '161vw',height:'100vh'}">
+            
+                <div class="namebox">
+                    <div>cheque</div>
+                    
+                    <p-dropdown [options]="selectedChequesOfPerson" 
+                    [(ngModel)]="selectedCP"
+                    [filter]="true" filterBy="instrumentnumber" 
+                    [showClear]="true" 
+                    placeholder="Select cheque" [required]="true" 
+                    #selectCP="ngModel" [ngModelOptions]="{standalone: true}" (onChange)="cpChange($event)" [style]="{width: '100%'}">
+                        <ng-template pTemplate="selectedItem">
+                            <div *ngIf="selectedCP">
+                                <div>{{selectedCP.instrumentnumber.toString() +' - '+selectedCP.amount.toString()}}</div>
+                            </div>
+                        </ng-template>
+                        <ng-template let-cheque pTemplate="item">
+                            <div>
+                                <div>{{cheque.instrumentnumber.toString() +' - '+cheque.amount.toString()}}</div>
+                            </div>
+                        </ng-template>
+                    </p-dropdown>
+
+                    <ng-template [ngIf]="selectCP.errors">
+                        <small id="username2-help" class="p-error block">you must select a cheque</small>
+                    </ng-template>
+                
+                </div>
+
+                <ng-template pTemplate="footer">
+                    <p-button icon="pi pi-check" (click)="handleAddCheque()" label="Ok" styleClass="p-button-text"></p-button>
+                </ng-template>
+
+            </p-dialog>
+
+
+            <p-dialog header="Edit Cheque Voucher" [(visible)]="displayEditChequeModal" [modal]="true"
+                [draggable]="false" [resizable]="false" [style]="{width: '161vw',height:'100vh'}">
+            
+                <div class="namebox">
+                    <div>cheque</div>
+                    
+                    <p-dropdown [options]="selectedChequesOfPerson" 
+                    [(ngModel)]="selectedCP"
+                    [filter]="true" filterBy="instrumentnumber" 
+                    [showClear]="true" 
+                    placeholder="Select cheque" [required]="true" 
+                    #selectCP="ngModel" [ngModelOptions]="{standalone: true}" (onChange)="cpChange($event)" [style]="{width: '100%'}">
+                        <ng-template pTemplate="selectedItem">
+                            <div *ngIf="selectedCP">
+                                <div>{{selectedCP.instrumentnumber.toString() +' - '+selectedCP.amount.toString()}}</div>
+                            </div>
+                        </ng-template>
+                        <ng-template let-cheque pTemplate="item">
+                            <div>
+                                <div>{{cheque.instrumentnumber.toString() +' - '+cheque.amount.toString()}}</div>
+                            </div>
+                        </ng-template>
+                    </p-dropdown>
+
+                    <ng-template [ngIf]="selectCP.errors">
+                        <small id="username2-help" class="p-error block">you must select a cheque</small>
+                    </ng-template>
+                
+                </div>
+
+                <ng-template pTemplate="footer">
+                    <p-button icon="pi pi-check" (click)="handleUpdateCheque()" label="Ok" styleClass="p-button-text"></p-button>
+                </ng-template>
+
+            </p-dialog>
+
+
+
+            <p-dialog header="Sale Voucher" [(visible)]="displayOtherModal" [modal]="true"
+                [draggable]="false" [resizable]="false">
+            
+                <!-- <div>
+                    <div>Product or Service</div>
+                    <p-autoComplete
+                        [(ngModel)]="selectedItem"
+                        [suggestions]="filteredItems" 
+                        (completeMethod)="filterProductsServices($event)"
+                        field="itemdef.itemname" 
+                        [multiple]="false" class="autocomplete" 
+                        (onSelect)="handleOnSelectItem($event)"
+                        [style]="{'width':'100%'}"
+                        [inputStyle]="{'width':'100%'}" 
+                        [placeholder]="placeholderItem" 
+                        [ngModelOptions]="{standalone: true}"
+                        (ngModelChange)="itemChange($event)"
+                        [required]="true" #selectItem="ngModel" 
+                        [forceSelection]="true">
+    
+                        <ng-template let-selectedItem pTemplate="item">
+                            <div>{{selectedItem.itemdef.itemname}} - {{selectedItem.itemdef.id}}</div>
+                            
+                        </ng-template>
+    
+                    </p-autoComplete>
+                    <ng-template [ngIf]="selectItem.errors">
+                        <small id="username2-help" class="p-error block">you must select an item</small>
+                    </ng-template>
+    
+                </div> -->
+            </p-dialog>
+
+            
+
+        </form>
+        
+        <!-- <pre>{{newInvoice | json }}</pre> -->
+
+        <ng-template pTemplate="footer">
+            <p-button icon="pi pi-check" (click)="handleSavePayment()" label="Save" styleClass="p-button-text"></p-button>
+        </ng-template>
+
+    </p-dialog>
+
+    
+
+
+    <p-dialog header="View Payment" [(visible)]="displayViewModal" [modal]="true" [style]="{width: '100%'}">
+        <div>
+            <!-- <pre>{{selectedInvoice.partyaccounthead | json }}</pre> -->
+        </div>
+    
+        <div>Date: {{selectedInvoice.date}} </div>
+        <div>Vendor: {{ viewPartyName }}</div>
+     
+        <div class="card">
+            <p-table [value]="selectedInvoice.vouchers" [scrollable]="true"  
+            selectionMode="single" scrollHeight="200px" dataKey="recordid" selectionMode="single" styleClass="p-datatable-sm">
+                
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>Instrument</th>
+                        <th>Amount</th>
+                        <!-- <th>Modify</th> -->
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-v let-i="rowIndex">
+                    <tr>
+                        <td>{{v.object.instrumenttype}} {{v.object.instrumentnumber}}</td> 
+                        <td>{{v.object.amount | number: '1.2-2'}}</td>
+                        
+                        
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="footer">
+                    <tr>
+                        <td colspan="4" class="text-right">Total</td>
+                        <td >{{viewTotal | number: '1.2-2'}}</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    
+        <!-- <p-table [value]="viewList">
+            
+            <ng-template pTemplate="body" let-car let-i="rowIndex">
+                <tr *ngIf="i === 0">
+                    <td colspan="5"><h1>{{car.col1}}</h1></td>
+                </tr>
+                <tr *ngIf="i === 1">
+                    <td colspan="5">{{car.col1}}</td>
+                </tr>
+                <tr *ngIf="i === 2">
+                    <td rowspan="2">{{car.col1}}</td>
+                    <td rowspan="2">{{car.col2}}</td>
+                    <td rowspan="2">{{car.col3}}</td>
+                    <td>{{car.col4}}</td>
+                    <td>{{car.col5}}</td>
+                </tr>
+                <tr *ngIf="i === 3">
+                    <td colspan="3" class="text-right"></td>
+                    <td>{{car.col1}}</td>
+                    <td>{{car.col2}}</td>
+                </tr>
+            </ng-template>
+        </p-table> -->
+    </p-dialog>
+
+    <p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+
+
+    <ng-template [ngIf]="inProgress">
+        <div class="overlay" id="modal">
+            <p-progressSpinner></p-progressSpinner>
+        </div>
+    </ng-template>
+
+</div>

@@ -1,0 +1,219 @@
+<style>
+    .container{
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto;
+      grid-template-columns: auto;
+      
+    }
+    
+    .namebox {
+        /* background-color: chartreuse; */
+        
+        width: 100%;
+        padding: 1em;
+        padding-left: 1em;
+        padding-top: 1em;
+        padding-right: calc(20%);
+
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .modifytax {
+        display: grid;
+        grid-template-areas: 'edit delete';
+        gap: 5px;
+    }
+
+    .displayline {
+        display: grid;
+        grid-template-areas: 'qty uom am';
+        gap: 5px;
+    }
+
+    .pcradiogroup{
+        display: grid;
+        grid-template-areas: 'rit ret';
+        gap: 5px;
+        
+    }
+
+    
+.stocktableprogress {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        left: 0;
+        background-color: rgba(255, 1, 1, 0);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+}
+
+
+    .overlay {
+
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        left: 0;
+        background-color: rgba(255, 1, 1, 0);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+    }
+
+</style>
+
+    
+
+
+
+
+<div class="container"> 
+    
+    
+    <div></div>
+    <div>Register of Units of Measurement</div>
+    <div>
+        <p-button (click)="showModalDialog()" icon="pi pi-external-link" label="New"></p-button>
+        <p-button (click)="handleMore()" icon="pi pi-external-link" label="Next"></p-button>
+    </div>
+    
+
+    <div class="card">
+        <p-table [value]="uoms" [scrollable]="true"  
+        selectionMode="single" scrollHeight="500px" 
+         (onRowSelect)="onRowSelect($event)" dataKey="recordid" selectionMode="single" styleClass="p-datatable-sm">
+            
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>UOM</th>
+                    <th>Symbol</th>
+                    <th>Country</th>
+                    
+                    <th>Modify</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-v let-i="rowIndex">
+                <tr>
+                    <td>{{v.uom}}</td>
+                    <td>{{v.symbol}}</td>
+                    <td>{{v.country}}</td>
+                    
+                    <td>
+                        <!-- <div class="displayline">
+                            <button pButton class="p-button-sm" (click)="handleDeleteTag(i)">VIEW</button>
+                        </div> -->
+                        
+                    </td>
+                    
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+
+    <p-dialog header="UOM" [(visible)]="displayModal" [modal]="true" [style]="{width: '100%'}"
+        [draggable]="false" [resizable]="false">
+    
+    
+        <div class="formbox">
+    
+            <form #f="ngForm" autocomplete="off" novalidate class="box">
+        
+                <div class="ahinputbox">
+                    <input type="text" 
+                    #uomTitle="ngModel" 
+                    pInputText 
+                    class="p-inputtext-sm" 
+                    placeholder="enter uom" 
+                    [ngModelOptions]="{standalone: true}"
+                     [(ngModel)]="uom.uom" 
+                     autocomplete="off" 
+                     minlength="3" 
+                     required 
+                     (ngModelChange)="inputChange($event)" 
+                     >
+                    <ng-template [ngIf]="uomTitle.errors">
+                        <small id="username2-help" class="p-error block">uom is required and must be atleast 3 letters</small>
+                    </ng-template>
+                </div>
+                
+                <div class="ahinputbox">
+                    <input type="text" 
+                    #symbolTitle="ngModel" 
+                    pInputText 
+                    class="p-inputtext-sm" 
+                    placeholder="enter symbol" 
+                    [ngModelOptions]="{standalone: true}"
+                     [(ngModel)]="uom.symbol" 
+                     autocomplete="off" 
+                     minlength="1" 
+                     required 
+                     (ngModelChange)="inputChange($event)" 
+                     >
+                    <ng-template [ngIf]="symbolTitle.errors">
+                        <small id="username2-help" class="p-error block">symbol is required and must be atleast one letter</small>
+                    </ng-template>
+                </div>
+
+                <div class="ahinputbox">
+                    <input type="text" 
+                    #countryTitle="ngModel" 
+                    pInputText 
+                    class="p-inputtext-sm" 
+                    placeholder="enter country or type global" 
+                    [ngModelOptions]="{standalone: true}"
+                     [(ngModel)]="uom.country" 
+                     autocomplete="off" 
+                     minlength="3" 
+                     required 
+                     (ngModelChange)="inputChange($event)" 
+                     >
+                    <ng-template [ngIf]="countryTitle.errors">
+                        <small id="username2-help" class="p-error block">country is required and must be atleast 3 letters</small>
+                    </ng-template>
+                </div>
+                
+    
+            </form>
+        
+            <!-- <pre>{{item | json}}</pre>
+            <pre>{{itemTitle.errors | json}}</pre>
+            <pre>{{ selectUOM.errors | json}}</pre>
+            <pre>SELECTED TAX {{selectedTax | json}}</pre>
+    
+            <pre>TAX FORM VALID ? {{ (taxName.errors || taxPercent.errors || selectTaxType.errors) || disableControls ? true : false}}</pre>
+         -->
+        </div>
+    
+
+
+        
+        <ng-template pTemplate="footer">
+            <p-button icon="pi pi-check" (click)="handleSave()" label="Save" styleClass="p-button-text"></p-button>
+        </ng-template>
+    </p-dialog>
+    
+    
+    
+
+    <p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+
+
+    <ng-template [ngIf]="inProgress">
+        <div class="overlay" id="modal">
+            <p-progressSpinner></p-progressSpinner>
+        </div>
+    </ng-template>
+
+
+    
+</div>
